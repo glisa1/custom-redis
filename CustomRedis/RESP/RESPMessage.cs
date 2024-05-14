@@ -8,18 +8,13 @@ public class RESPMessage
 
     public RESPMessage(string message, bool incoming)
     {
+        if (string.IsNullOrWhiteSpace(message))
+            throw new ArgumentException(nameof(message));
+
+        if (incoming && message[0] != RESPConstants.ArrayType)
+            throw new ArgumentException("Message in wrong format. Expected Array type.");
+
         Message = message;
         Incoming = incoming;
-
-        ValidateMessage();
-    }
-
-    private void ValidateMessage()
-    {
-        if (string.IsNullOrWhiteSpace(Message))
-            throw new ArgumentException(nameof(Message));
-
-        if (Incoming && Message[0] != RESPConstants.ArrayType)
-            throw new ArgumentException("Message in wrong format. Expected Array type.");
     }
 }
