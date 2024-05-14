@@ -11,6 +11,8 @@ internal class RESPSerializer
             messageContent = SerializeNull();
         else if (messageObject is string)
             messageContent = SerializeSimpleStringType((string)messageObject);
+        else if (messageObject is char[])
+            messageContent = SerializeBulkStrings((char[])messageObject);
         else if (messageObject is Exception)
             messageContent = SerializeErrorType((Exception)messageObject);
         else if (messageObject is int)
@@ -19,11 +21,6 @@ internal class RESPSerializer
             messageContent = SerializeArrayType((ICollection<object>)messageObject);
 
         return new RESPMessage(messageContent, false);
-    }
-
-    public RESPMessage SerializeBulkString(string message)
-    {
-        return new RESPMessage(SerializeBulkStrings(message), false);
     }
 
     private string SerializeSimpleStringType(string stringType)
@@ -46,9 +43,9 @@ internal class RESPSerializer
         return RESPConstants.NullValues[0];
     }
 
-    private string SerializeBulkStrings(string bulkString)
+    private string SerializeBulkStrings(char[] bulkString)
     {
-        return $"{RESPConstants.BulkStringType}{bulkString.Length}{RESPConstants.Terminator}{bulkString}{RESPConstants.Terminator}";
+        return $"{RESPConstants.BulkStringType}{bulkString.Length}{RESPConstants.Terminator}{new string(bulkString)}{RESPConstants.Terminator}";
     }
 
     private string SerializeArrayType(ICollection<object> data)
@@ -70,7 +67,9 @@ internal class RESPSerializer
             else if (item is int)
                 stringBuilder.Append(SerializeIntegerType((int)item));
             else if (item is string)
-                stringBuilder.Append(SerializeBulkStrings((string)item));
+                stringBuilder.Append(SerializeSimpleStringType((string)item));
+            else if (item is char[])
+                stringBuilder.Append(SerializeBulkStrings((char[])item));
             else if (item is Exception)
                 stringBuilder.Append(SerializeErrorType((Exception)item));
             else if (item is ICollection<object>)

@@ -44,16 +44,14 @@ namespace RESP.Test
             Assert.Equal(serializedMessage.Message, expectedMessage);
         }
 
-        //[Theory]
-        //[InlineData("hello", "$5\r\nhello\r\n")]
-        //[InlineData("world", "$5\r\nworld\r\n")]
-        //[InlineData("hello world", "$11\r\nhello world\r\n")]
-        //public void OnMessageSerialization_Passes_WhenMessageIsOfBulkStringType(string messageObject, string expectedMessage)
-        //{
-        //    var serializedMessage = _parser.SerializeBulkString(messageObject);
+        [Theory]
+        [MemberData(nameof(BulkStringTypeData))]
+        public void OnMessageSerialization_Passes_WhenMessageIsOfBulkStringType(char[] messageObject, string expectedMessage)
+        {
+            var serializedMessage = _parser.SerializeMessage(messageObject);
 
-        //    Assert.Equal(serializedMessage.Message, expectedMessage);
-        //}
+            Assert.Equal(serializedMessage.Message, expectedMessage);
+        }
 
         [Theory]
         [MemberData(nameof(ArrayTypeData))]
@@ -64,15 +62,24 @@ namespace RESP.Test
             Assert.Equal(serializedMessage.Message, expectedMessage);
         }
 
+        public static IEnumerable<object[]> BulkStringTypeData()
+        {
+            yield return new object[] { "hello".ToCharArray(), "$5\r\nhello\r\n" };
+            yield return new object[] { "world".ToCharArray(), "$5\r\nworld\r\n" };
+            yield return new object[] { "hello world".ToCharArray(), "$11\r\nhello world\r\n" };
+            yield return new object[] { "wo\rrld".ToCharArray(), "$6\r\nwo\rrld\r\n" };
+            yield return new object[] { "wo\nrld".ToCharArray(), "$6\r\nwo\nrld\r\n" };
+            yield return new object[] { "wo\nrld".ToCharArray(), "$6\r\nwo\nrld\r\n" };
+            yield return new object[] { "wo\r\nrld".ToCharArray(), "$7\r\nwo\r\nrld\r\n" };
+        }
+
         public static IEnumerable<object[]> ArrayTypeData()
         {
-            yield return new object[] { new List<object?> { "hello", "world" }, "*2\r\n$5\r\nhello\r\n$5\r\nworld\r\n" };
+            yield return new object[] { new List<object?> { "hello".ToCharArray(), "world".ToCharArray() }, "*2\r\n$5\r\nhello\r\n$5\r\nworld\r\n" };
             yield return new object[] { new List<object?> { 1, 2, 3 }, "*3\r\n:1\r\n:2\r\n:3\r\n" };
-            yield return new object[] { new List<object?> { 1, 2, 3, 4, "hello" }, "*5\r\n:1\r\n:2\r\n:3\r\n:4\r\n$5\r\nhello\r\n" };
-            yield return new object[] { new List<object?> { "hello", null, "world" }, "*3\r\n$5\r\nhello\r\n$-1\r\n$5\r\nworld\r\n" };
-            // The bottom option is commented out because it expects 'hello' to be simple string and currently the way to
-            // differ the simple from bulk string is not implemented. Also the 'world' should be error type.
-            //yield return new object[] { new List<object?> { new List<object?> { 1, 2, 3 }, new List<object?> { "hello", "world" } }, "*2\r\n*3\r\n:1\r\n:2\r\n:3\r\n*2\r\n+Hello\r\n-World\r\n" };
+            yield return new object[] { new List<object?> { 1, 2, 3, 4, "hello".ToCharArray() }, "*5\r\n:1\r\n:2\r\n:3\r\n:4\r\n$5\r\nhello\r\n" };
+            yield return new object[] { new List<object?> { "hello".ToCharArray(), null, "world".ToCharArray() }, "*3\r\n$5\r\nhello\r\n$-1\r\n$5\r\nworld\r\n" };
+            yield return new object[] { new List<object?> { new List<object?> { 1, 2, 3 }, new List<object?> { "Hello", new Exception("World") } }, "*2\r\n*3\r\n:1\r\n:2\r\n:3\r\n*2\r\n+Hello\r\n-World\r\n" };
         }
     }
 }
