@@ -1,4 +1,7 @@
-﻿namespace RESP;
+﻿using System;
+using System.Text;
+
+namespace RESP;
 
 public static class RESPDeserializer
 {
@@ -11,37 +14,25 @@ public static class RESPDeserializer
 
     public static RESPMessage SerializeMessage(object messageObject)
     {
-        if (messageObject == null)
-            throw new ArgumentNullException("message");
-
         var messageContent = string.Empty;
-        if (messageObject is string)
+        if (messageObject == null)
+            messageContent = SerializeNull();
+        else if (messageObject is string)
             messageContent = SerializeSimpleStringType((string)messageObject);
         else if (messageObject is Exception)
             messageContent = SerializeErrorType((Exception)messageObject);
+        else if (messageObject is int)
+            messageContent = SerializeIntegerType((int)messageObject);
+        else if (messageObject is ICollection<object>)
+            messageContent = SerializeArrayType((ICollection<object>)messageObject);
 
-        return new RESPMessage(messageContent, false);
+            return new RESPMessage(messageContent, false);
     }
 
-    //private void DeserializeIntegerType()
-    //{
-    //    var messageData = RemoveOperation();
-
-    //    int deserializedValue = int.Parse(messageData);
-    //}
-
-    //private void DeserializeBulkStringType()
-    //{
-    //    var messageData = RemoveOperation();
-
-    //    var dataLengthAndData = messageData.Split(RESPConstants.Terminator);
-
-    //    if (dataLengthAndData.Length != 2)
-    //        throw new ArgumentException();
-
-    //    var dataLength = int.Parse(dataLengthAndData[0]);
-    //    var data = dataLengthAndData[1];
-    //}
+    public static RESPMessage SerializeBulkString(string message)
+    {
+        return new RESPMessage(SerializeBulkStrings(message), false);
+    }
 
     private static List<string> DeserializeArrayType(string message)
     {
@@ -101,13 +92,55 @@ public static class RESPDeserializer
         return messageParts.Length - 1 == numberOfExpectedParameters * 2;
     }
 
-    private static string SerializeSimpleStringType(string message)
+    private static string SerializeSimpleStringType(string stringType)
     {
-        return $"{RESPConstants.SimpleStringType}{message}{RESPConstants.Terminator}";
+        return $"{RESPConstants.SimpleStringType}{stringType}{RESPConstants.Terminator}";
     }
 
     private static string SerializeErrorType(Exception exception)
     {
         return $"{RESPConstants.ErrorType}{exception.Message}{RESPConstants.Terminator}";
+    }
+
+    private static string SerializeIntegerType(int integerType)
+    {
+        return $"{RESPConstants.IntegerType}{integerType}{RESPConstants.Terminator}";
+    }
+
+    private static string SerializeNull()
+    {
+        return RESPConstants.NullValues[0];
+    }
+
+    private static string SerializeBulkStrings(string bulkString)
+    {
+        return $"{RESPConstants.BulkStringType}{bulkString.Length}{RESPConstants.Terminator}{bulkString}{RESPConstants.Terminator}";
+    }
+
+    private static string SerializeArrayType(ICollection<object> data)
+    {
+        if (data.Count == 0)
+        {
+            return RESPConstants.EmptyArray;
+        }
+
+        var stringBuilder = new StringBuilder();
+        stringBuilder.Append(RESPConstants.ArrayType);
+        stringBuilder.Append(data.Count);
+        stringBuilder.Append(RESPConstants.Terminator);
+
+        foreach (var item in data)
+        {
+            if (item is null)
+                stringBuilder.Append(SerializeNull());
+            else if (item is int)
+                stringBuilder.Append(SerializeIntegerType((int)item));
+            else if (item is string)
+                stringBuilder.Append(SerializeBulkStrings((string)item));
+            else if (item is ICollection<object>)
+                stringBuilder.Append(SerializeArrayType((ICollection<object>)item));
+        }
+
+        return stringBuilder.ToString();
     }
 }
