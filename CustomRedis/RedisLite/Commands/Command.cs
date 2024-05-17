@@ -13,6 +13,5 @@ public abstract class Command
     public abstract int NumberOfExpectedArguments { get; }
     public abstract string CommandName { get; }
     public List<string> Arguments { get; }
-    public abstract Type ResponseType { get; }
     public abstract object Execute();
 }

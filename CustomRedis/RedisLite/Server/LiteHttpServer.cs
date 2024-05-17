@@ -1,7 +1,6 @@
 ﻿using RedisLite.Commands;
 using RESP;
 using Serilog;
-using System.Collections;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -41,29 +40,32 @@ internal class LiteHttpServer
 
             if (recievedData.Length == 0)
             {
-                //connection.Close();
-
-                continue;
+                var responseExceptionMessage = respParser.SerializeMessage(new Exception("Received no data"));
+                await WriteResponseAsync(networkStream, responseExceptionMessage, cancellationToken);
             }
 
-            var commandsAndArguments = respParser.DeserializeMessage(System.Text.Encoding.UTF8.GetString(recievedData));
+            var commandsAndArguments = respParser.DeserializeMessage(Encoding.UTF8.GetString(recievedData));
 
             var command = CommandsMapper.MapToCommand(commandsAndArguments);
 
-            await WriteResponseAsync(networkStream, "Hello there!");
+            var commandResult = command.Execute();
+
+            var responseMessage = respParser.SerializeMessage(commandResult);
+
+            await WriteResponseAsync(networkStream, responseMessage, cancellationToken);
 
             connection.Close();
         }
     }
 
-    private async Task WriteResponseAsync(NetworkStream networkStream, string message, CancellationToken cancellationToken = default)
+    private async Task WriteResponseAsync(NetworkStream networkStream, RESPMessage message, CancellationToken cancellationToken = default)
     {
-        var contentLength = Encoding.UTF8.GetByteCount(message);
+        var contentLength = Encoding.UTF8.GetByteCount(message.Message);
 
         var response = $@"HTTP/1.1 200 OK
                         Content-Type: text/plain; charset=UTF-8
                         Content-Length: {contentLength}
-                        {message}";
+                        {message.Message}";
         var responseBytes = Encoding.UTF8.GetBytes(response);
 
         await networkStream.WriteAsync(responseBytes, 0, responseBytes.Length, cancellationToken);
