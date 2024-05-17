@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RESP", "RESP\RESP.csproj", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C2F2FBE2-69DE-422A-8161-D59A0A9F6E2A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RESP.Test", "RESP.Test\RESP.Test.csproj", "{2E1141AE-0F48-473A-9EC2-985F5332C937}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RESP.Test", "RESP.Test\RESP.Test.csproj", "{2E1141AE-0F48-473A-9EC2-985F5332C937}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedisLite", "RedisLite\RedisLite.csproj", "{3B648FCB-92A4-45AC-B405-6A1E552BED61}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +25,10 @@ Global
 		{2E1141AE-0F48-473A-9EC2-985F5332C937}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E1141AE-0F48-473A-9EC2-985F5332C937}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E1141AE-0F48-473A-9EC2-985F5332C937}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B648FCB-92A4-45AC-B405-6A1E552BED61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B648FCB-92A4-45AC-B405-6A1E552BED61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B648FCB-92A4-45AC-B405-6A1E552BED61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B648FCB-92A4-45AC-B405-6A1E552BED61}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
