@@ -6,21 +6,28 @@ internal class RESPSerializer
 {
     public RESPMessage SerializeMessage(object messageObject)
     {
-        var messageContent = string.Empty;
-        if (messageObject == null)
-            messageContent = SerializeNull();
-        else if (messageObject is string)
-            messageContent = SerializeSimpleStringType((string)messageObject);
-        else if (messageObject is char[])
-            messageContent = SerializeBulkStrings((char[])messageObject);
-        else if (messageObject is Exception)
-            messageContent = SerializeErrorType((Exception)messageObject);
-        else if (messageObject is int)
-            messageContent = SerializeIntegerType((int)messageObject);
-        else if (messageObject is ICollection<object>)
-            messageContent = SerializeArrayType((ICollection<object>)messageObject);
+        try
+        {
+            var messageContent = string.Empty;
+            if (messageObject == null)
+                messageContent = SerializeNull();
+            else if (messageObject is string)
+                messageContent = SerializeSimpleStringType((string)messageObject);
+            else if (messageObject is char[])
+                messageContent = SerializeBulkStrings((char[])messageObject);
+            else if (messageObject is Exception)
+                messageContent = SerializeErrorType((Exception)messageObject);
+            else if (messageObject is int)
+                messageContent = SerializeIntegerType((int)messageObject);
+            else if (messageObject is ICollection<object>)
+                messageContent = SerializeArrayType((ICollection<object>)messageObject);
 
-        return new RESPMessage(messageContent, false);
+            return new RESPMessage(messageContent, false);
+        }
+        catch (Exception ex)
+        {
+            return new RESPMessage(SerializeErrorType(ex), false);
+        }
     }
 
     private string SerializeSimpleStringType(string stringType)
