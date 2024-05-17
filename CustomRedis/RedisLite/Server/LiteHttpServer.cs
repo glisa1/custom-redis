@@ -1,4 +1,7 @@
-﻿using Serilog;
+﻿using RedisLite.Commands;
+using RESP;
+using Serilog;
+using System.Collections;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -24,6 +27,8 @@ internal class LiteHttpServer
         Log.Information($"Server started on port {port}.");
         Log.Information("Listening for requests...");
 
+        var respParser = new RESPParser();
+
         while (true)
         {
             serverListenter.Start();
@@ -31,6 +36,19 @@ internal class LiteHttpServer
             var connection = await serverListenter.AcceptTcpClientAsync(cancellationToken);
 
             var networkStream = connection.GetStream();
+            var recievedData = new byte[] { };
+            await networkStream.ReadAsync(recievedData, cancellationToken);
+
+            if (recievedData.Length == 0)
+            {
+                //connection.Close();
+
+                continue;
+            }
+
+            var commandsAndArguments = respParser.DeserializeMessage(System.Text.Encoding.UTF8.GetString(recievedData));
+
+            var command = CommandsMapper.MapToCommand(commandsAndArguments);
 
             await WriteResponseAsync(networkStream, "Hello there!");
 
@@ -50,4 +68,24 @@ internal class LiteHttpServer
 
         await networkStream.WriteAsync(responseBytes, 0, responseBytes.Length, cancellationToken);
     }
+
+    //private List<string> GetCommandAndArguments(byte[] input)
+    //{
+    //    var result = new List<string>();
+    //    var stringBuilder = new StringBuilder();
+    //    foreach (var element in input)
+    //    {
+    //        if (element == ' ')
+    //        {
+    //            result.Add(stringBuilder.ToString());
+    //            stringBuilder.Clear();
+    //        }
+    //        else
+    //        {
+    //            stringBuilder.Append(element);
+    //        }
+    //    }
+
+    //    return result;
+    //}
 }

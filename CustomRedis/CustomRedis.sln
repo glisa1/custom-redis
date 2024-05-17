@@ -9,7 +9,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C2F2FBE2
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RESP.Test", "RESP.Test\RESP.Test.csproj", "{2E1141AE-0F48-473A-9EC2-985F5332C937}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedisLite", "RedisLite\RedisLite.csproj", "{3B648FCB-92A4-45AC-B405-6A1E552BED61}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RedisLite", "RedisLite\RedisLite.csproj", "{3B648FCB-92A4-45AC-B405-6A1E552BED61}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedisLite.Test", "RedisLite.Test\RedisLite.Test.csproj", "{18C7D2F3-A108-4B5B-A447-4AEA0D11F8D9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,12 +31,17 @@ Global
 		{3B648FCB-92A4-45AC-B405-6A1E552BED61}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3B648FCB-92A4-45AC-B405-6A1E552BED61}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3B648FCB-92A4-45AC-B405-6A1E552BED61}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18C7D2F3-A108-4B5B-A447-4AEA0D11F8D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18C7D2F3-A108-4B5B-A447-4AEA0D11F8D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18C7D2F3-A108-4B5B-A447-4AEA0D11F8D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18C7D2F3-A108-4B5B-A447-4AEA0D11F8D9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{2E1141AE-0F48-473A-9EC2-985F5332C937} = {C2F2FBE2-69DE-422A-8161-D59A0A9F6E2A}
+		{18C7D2F3-A108-4B5B-A447-4AEA0D11F8D9} = {C2F2FBE2-69DE-422A-8161-D59A0A9F6E2A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CF707F2D-39B1-4DB3-AEEE-9F9E37C277CC}
