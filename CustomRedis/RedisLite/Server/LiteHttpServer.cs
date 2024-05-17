@@ -68,24 +68,4 @@ internal class LiteHttpServer
 
         await networkStream.WriteAsync(responseBytes, 0, responseBytes.Length, cancellationToken);
     }
-
-    //private List<string> GetCommandAndArguments(byte[] input)
-    //{
-    //    var result = new List<string>();
-    //    var stringBuilder = new StringBuilder();
-    //    foreach (var element in input)
-    //    {
-    //        if (element == ' ')
-    //        {
-    //            result.Add(stringBuilder.ToString());
-    //            stringBuilder.Clear();
-    //        }
-    //        else
-    //        {
-    //            stringBuilder.Append(element);
-    //        }
-    //    }
-
-    //    return result;
-    //}
 }
