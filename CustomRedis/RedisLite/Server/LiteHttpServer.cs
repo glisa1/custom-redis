@@ -1,4 +1,5 @@
-﻿using RedisLite.Commands;
+﻿using Newtonsoft.Json;
+using RedisLite.Commands;
 using RESP;
 using Serilog;
 using System.Net;
@@ -11,14 +12,18 @@ internal class LiteHttpServer
 {
     private readonly IPAddress ipAddress;
     private readonly int port;
-    private readonly TcpListener serverListenter;
+    private readonly HttpListener serverListenter;
+    private readonly RESPParser respParser;
 
     public LiteHttpServer(ServerConfig config)
     {
         ipAddress = IPAddress.Parse(config.HostAddress);
         port = config.Port;
 
-        serverListenter = new TcpListener(this.ipAddress, port);
+        serverListenter = new HttpListener();
+        serverListenter.Prefixes.Add($"http://{ipAddress}:{port}/");
+
+        respParser = new RESPParser();
     }
 
     public async Task StartAsync(CancellationToken cancellationToken = default)
@@ -26,48 +31,78 @@ internal class LiteHttpServer
         Log.Information($"Server started on port {port}.");
         Log.Information("Listening for requests...");
 
-        var respParser = new RESPParser();
+        serverListenter.Start();
 
-        while (true)
+        try
         {
-            serverListenter.Start();
-
-            var connection = await serverListenter.AcceptTcpClientAsync(cancellationToken);
-
-            var networkStream = connection.GetStream();
-            var recievedData = new byte[] { };
-            await networkStream.ReadAsync(recievedData, cancellationToken);
-
-            if (recievedData.Length == 0)
+            while (true)
             {
-                var responseExceptionMessage = respParser.SerializeMessage(new Exception("Received no data"));
-                await WriteResponseAsync(networkStream, responseExceptionMessage, cancellationToken);
+                var context = await serverListenter.GetContextAsync();
+                Log.Information("Connection established.");
+                
+                await HandleClientAsync(context, cancellationToken);
             }
+        }
+        finally
+        {
+            serverListenter.Stop();
+        }
+    }
 
-            var commandsAndArguments = respParser.DeserializeMessage(Encoding.UTF8.GetString(recievedData));
+    private async Task HandleClientAsync(HttpListenerContext context, CancellationToken cancellationToken = default)
+    {
+        var request = context.Request;
+        var response = context.Response;
+        try
+        {
+            var inputMessage = await HandleInputDataAndGetMessageAsync(request, cancellationToken);
 
-            var command = CommandsMapper.MapToCommand(commandsAndArguments);
+            var commandAndArguments = respParser.DeserializeMessage(inputMessage);
+
+            var command = CommandsMapper.MapToCommand(commandAndArguments);
 
             var commandResult = command.Execute();
 
             var responseMessage = respParser.SerializeMessage(commandResult);
 
-            await WriteResponseAsync(networkStream, responseMessage, cancellationToken);
-
-            connection.Close();
+            await WriteResponseAsync(response, responseMessage, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, ex.Message);
+            var responseExceptionMessage = respParser.SerializeMessage(ex);
+            await WriteResponseAsync(response, responseExceptionMessage, cancellationToken);
         }
     }
 
-    private async Task WriteResponseAsync(NetworkStream networkStream, RESPMessage message, CancellationToken cancellationToken = default)
+    private async Task<string> HandleInputDataAndGetMessageAsync(HttpListenerRequest request, CancellationToken cancellationToken = default)
     {
-        var contentLength = Encoding.UTF8.GetByteCount(message.Message);
+        var recievedData = new byte[1_024];
 
-        var response = $@"HTTP/1.1 200 OK
-                        Content-Type: text/plain; charset=UTF-8
-                        Content-Length: {contentLength}
-                        {message.Message}";
-        var responseBytes = Encoding.UTF8.GetBytes(response);
+        var receivedDataLength = await request.InputStream.ReadAsync(recievedData, cancellationToken);
 
-        await networkStream.WriteAsync(responseBytes, 0, responseBytes.Length, cancellationToken);
+        if (receivedDataLength == 0)
+        {
+            throw new ArgumentException("No data received.");
+        }
+
+        var receivedData = Encoding.UTF8.GetString(recievedData, 0, receivedDataLength);
+
+        var receivedDataObject = JsonConvert.DeserializeAnonymousType(receivedData, new { Message = string.Empty });
+
+        if (receivedDataObject == null)
+        {
+            throw new ArgumentException("No data received.");
+        }
+
+        return receivedDataObject.Message;
+    }
+
+    private async Task WriteResponseAsync(HttpListenerResponse response, RESPMessage responseMessage, CancellationToken cancellationToken = default)
+    {
+        byte[] buffer = Encoding.UTF8.GetBytes(responseMessage.Message);
+        response.ContentLength64 = buffer.Length;
+
+        await response.OutputStream.WriteAsync(buffer, 0, buffer.Length, cancellationToken);
     }
 }

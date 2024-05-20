@@ -1,6 +1,4 @@
-﻿using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace RESP.Test
+﻿namespace RESP.Test
 {
     public class RESPMessageSerializeTests
     {
@@ -14,7 +12,7 @@ namespace RESP.Test
         [Theory]
         [InlineData("OK", "+OK\r\n")]
         [InlineData("hello world", "+hello world\r\n")]
-        public void OnMessageSerialization_Passes_WhenMessageIsSimpleStringType(string messageObject, string expectedMessage)
+        public void OnMessageSerialization_Passes_WhenMessageIsOfCorrectSimpleStringType(string messageObject, string expectedMessage)
         {
             var serializedMessage = _parser.SerializeMessage(messageObject);
 
@@ -24,7 +22,7 @@ namespace RESP.Test
         [Theory]
         [InlineData("Error message", "-Error message\r\n")]
         [InlineData("Message in wrong format. Unexpected number of array elements.", "-Message in wrong format. Unexpected number of array elements.\r\n")]
-        public void OnMessageSerialization_Passes_WhenMessageIsOfErrorType(string messageObject, string expectedMessage)
+        public void OnMessageSerialization_Passes_WhenMessageIsOfCorrectErrorType(string messageObject, string expectedMessage)
         {
             var serializedMessage = _parser.SerializeMessage(new Exception(messageObject));
 
@@ -37,7 +35,7 @@ namespace RESP.Test
         [InlineData(1000, ":1000\r\n")]
         [InlineData(-1, ":-1\r\n")]
         [InlineData(-1000, ":-1000\r\n")]
-        public void OnMessageSerialization_Passes_WhenMessageIsOfIntegerType(int messageObject, string expectedMessage)
+        public void OnMessageSerialization_Passes_WhenMessageIsOfCorrectIntegerType(int messageObject, string expectedMessage)
         {
             var serializedMessage = _parser.SerializeMessage(messageObject);
 
@@ -46,7 +44,7 @@ namespace RESP.Test
 
         [Theory]
         [MemberData(nameof(BulkStringTypeData))]
-        public void OnMessageSerialization_Passes_WhenMessageIsOfBulkStringType(char[] messageObject, string expectedMessage)
+        public void OnMessageSerialization_Passes_WhenMessageIsOfCorrectBulkStringType(char[] messageObject, string expectedMessage)
         {
             var serializedMessage = _parser.SerializeMessage(messageObject);
 
@@ -55,7 +53,7 @@ namespace RESP.Test
 
         [Theory]
         [MemberData(nameof(ArrayTypeData))]
-        public void OnMessageSerialization_Passes_WhenMessageIsOfArrayType(ICollection<object> messageObject, string expectedMessage)
+        public void OnMessageSerialization_Passes_WhenMessageIsOfCorrectArrayType(ICollection<object> messageObject, string expectedMessage)
         {
             var serializedMessage = _parser.SerializeMessage(messageObject);
 
@@ -79,6 +77,7 @@ namespace RESP.Test
             yield return new object[] { new List<object?> { 1, 2, 3 }, "*3\r\n:1\r\n:2\r\n:3\r\n" };
             yield return new object[] { new List<object?> { 1, 2, 3, 4, "hello".ToCharArray() }, "*5\r\n:1\r\n:2\r\n:3\r\n:4\r\n$5\r\nhello\r\n" };
             yield return new object[] { new List<object?> { "hello".ToCharArray(), null, "world".ToCharArray() }, "*3\r\n$5\r\nhello\r\n$-1\r\n$5\r\nworld\r\n" };
+            yield return new object[] { new List<object?> { "ping".ToCharArray() }, "*1\r\n$4\r\nping\r\n" };
             yield return new object[] { new List<object?> { new List<object?> { 1, 2, 3 }, new List<object?> { "Hello", new Exception("World") } }, "*2\r\n*3\r\n:1\r\n:2\r\n:3\r\n*2\r\n+Hello\r\n-World\r\n" };
         }
     }

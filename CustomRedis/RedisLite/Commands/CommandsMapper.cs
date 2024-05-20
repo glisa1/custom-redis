@@ -25,7 +25,9 @@ public static class CommandsMapper
             throw new Exception("Command not supported.");
         }
 
-        var commandInstance = Activator.CreateInstance(commandType, new object[] { commandAndArguments }) as Command;
+        var arguments = new List<string>(commandAndArguments[1..]);
+
+        var commandInstance = Activator.CreateInstance(commandType, new object[] { arguments }) as Command;
 
         if (commandInstance == null) 
         {
