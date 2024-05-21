@@ -40,6 +40,6 @@ public static class CommandsMapper
     private static Dictionary<string, Type> CommandsMap => new Dictionary<string, Type>
     { 
         { "PING", typeof(PingCommand) },
-        { "ECHO", typeof(Exception) }
+        { "ECHO", typeof(EchoCommand) }
     };
 }
