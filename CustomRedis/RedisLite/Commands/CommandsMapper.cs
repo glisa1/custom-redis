@@ -18,7 +18,7 @@ public static class CommandsMapper
             throw new ArgumentException(nameof(commandAndArguments), nameof(command));
         }
 
-        var commandType = CommandsMap.GetValueOrDefault(command);
+        var commandType = CommandsMap.GetValueOrDefault(command.ToLower());
 
         if (commandType == null)
         {
@@ -39,7 +39,9 @@ public static class CommandsMapper
 
     private static Dictionary<string, Type> CommandsMap => new Dictionary<string, Type>
     { 
-        { "PING", typeof(PingCommand) },
-        { "ECHO", typeof(EchoCommand) }
+        { "ping", typeof(PingCommand) },
+        { "echo", typeof(EchoCommand) },
+        { "set", typeof(SetCommand) },
+        { "get", typeof(GetCommand) },
     };
 }
