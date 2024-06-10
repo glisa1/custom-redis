@@ -3,17 +3,16 @@ using RedisLite.Commands;
 using RESP;
 using Serilog;
 using System.Net;
-using System.Net.Sockets;
 using System.Text;
 
 namespace RedisLite.Server;
 
-internal class LiteHttpServer
+public class LiteHttpServer
 {
-    private readonly IPAddress ipAddress;
-    private readonly int port;
     private readonly HttpListener serverListenter;
     private readonly RESPParser respParser;
+    private readonly IPAddress ipAddress;
+    private readonly int port;
 
     public LiteHttpServer(ServerConfig config)
     {

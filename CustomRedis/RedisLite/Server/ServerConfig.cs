@@ -1,6 +1,6 @@
 ﻿namespace RedisLite.Server;
 
-internal class ServerConfig
+public class ServerConfig
 {
     internal string HostAddress { get; }
     internal int Port { get; }

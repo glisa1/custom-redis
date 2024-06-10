@@ -1,7 +1,4 @@
-﻿using System;
-using System.Text;
-
-namespace RESP;
+﻿namespace RESP;
 
 public class RESPDeserializer
 {
@@ -47,6 +44,12 @@ public class RESPDeserializer
 
             var stringLength = int.Parse(messageToWorkOn.Substring(0, indexOfFirstTerminator));
             var command = messageToWorkOn.Substring(indexOfFirstTerminator + RESPConstants.Terminator.Length, stringLength);
+
+            if (messageToWorkOn.Substring(indexOfFirstTerminator + RESPConstants.Terminator.Length + stringLength, RESPConstants.Terminator.Length) != RESPConstants.Terminator)
+            {
+                throw new ArgumentException("Message element has wrong length.");
+            }
+
             if (string.IsNullOrEmpty(command))
                 throw new ArgumentException("Message in wrong format.");
 

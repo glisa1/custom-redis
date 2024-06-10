@@ -48,6 +48,14 @@ namespace RESP.Test
             Assert.Throws<ArgumentException>(() => _parser.DeserializeMessage(respMessage));
         }
 
+        [Theory]
+        [InlineData("*2\r\n$4\r\nECHO\r\n$5\r\nHello world\r\n")]
+        [InlineData("*2\r\n$4\r\nECHO\r\n$1\r\nHello world\r\n")]
+        public void OnMessageDeserialization_Fails_WhenMessageBulkStringElementsHaveIncorrectLength(string respMessage)
+        {
+            Assert.Throws<ArgumentException>(() => _parser.DeserializeMessage(respMessage));
+        }
+
         [Fact]
         public void OnMessageDeserialization_Passes_WhenMessageIsInCorrectFormat()
         {
