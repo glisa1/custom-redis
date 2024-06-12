@@ -1,19 +1,17 @@
 ﻿using System.Collections;
+using System.Collections.Concurrent;
 
 namespace RedisLite;
 
 internal static class Persistance
 {
-    // Let it be hashtable for now but in the future it might be better to switch to 
-    // thread-safe collection such as ConcurrentDictionary, check link under
-    // https://stackoverflow.com/a/20020303/888472
-    private static Hashtable HashTable = new Hashtable();
+    private readonly static ConcurrentDictionary<string, object> keyValuePairs = new ConcurrentDictionary<string, object>();
 
     public static object SetKey(string key, object value)
     {
         try
         {
-            HashTable[key] = value;
+            keyValuePairs.AddOrUpdate(key, value, (key, oldValue) => value);
             return "OK";
         }
         catch (Exception ex)
@@ -26,11 +24,7 @@ internal static class Persistance
     {
         try
         {
-            var value = HashTable[key];
-            if (value == null)
-            {
-                return null;
-            }
+            keyValuePairs.TryGetValue(key, out var value);
 
             return value;
         }
