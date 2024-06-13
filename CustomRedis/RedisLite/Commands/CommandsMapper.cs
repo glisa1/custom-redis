@@ -18,7 +18,14 @@ public static class CommandsMapper
             throw new ArgumentException(nameof(commandAndArguments), nameof(command));
         }
 
-        var commandType = CommandsMap.GetValueOrDefault(command.ToLower());
+        var commandLower = command.ToLower();
+
+        if (commandLower == "set" && commandAndArguments.Count > 2) 
+        {
+            commandLower += commandAndArguments[1].ToLower();
+        }
+
+        var commandType = CommandsMap.GetValueOrDefault(commandLower);
 
         if (commandType == null)
         {
@@ -42,6 +49,10 @@ public static class CommandsMapper
         { "ping", typeof(PingCommand) },
         { "echo", typeof(EchoCommand) },
         { "set", typeof(SetCommand) },
+        { "set ex", typeof(SetExCommand) },
+        { "set px", typeof(SetPxCommand) },
+        { "set eaxt", typeof(SetEaxtCommand) },
+        { "set pxat", typeof(SetPxatCommand) },
         { "get", typeof(GetCommand) },
     };
 }
