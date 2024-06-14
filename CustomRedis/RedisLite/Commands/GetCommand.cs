@@ -1,4 +1,7 @@
-﻿namespace RedisLite.Commands;
+﻿using RedisLite.Persistance;
+using RESP;
+
+namespace RedisLite.Commands;
 
 internal class GetCommand : Command
 {
@@ -10,12 +13,18 @@ internal class GetCommand : Command
     public override string CommandName => "get";
     public override object Execute()
     {
-        var value = Persistance.GetValue(Arguments[0]);
+        var value = PersistanceStore.GetValue(Arguments[0]) as PersistanceObject;
         if (value == null)
         {
             return value!;
         }
 
-        return value.ToString()!.ToCharArray();
+        if (value.ExpiryDate != null && value.ExpiryDate < DateTime.Now)
+        {
+            return null;
+            //Do we need to delete the key and value?
+        }
+
+        return value.PersistedData.ToString()!.ToCharArray();
     }
 }

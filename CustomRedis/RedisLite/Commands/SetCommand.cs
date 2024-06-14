@@ -1,4 +1,6 @@
-﻿namespace RedisLite.Commands;
+﻿using RedisLite.Persistance;
+
+namespace RedisLite.Commands;
 
 internal class SetCommand : Command
 {
@@ -10,6 +12,7 @@ internal class SetCommand : Command
     public override string CommandName => "set";
     public override object Execute()
     {
-        return Persistance.SetKey(Arguments[0], Arguments[1]);
+        var persistanceData = new PersistanceObject(Arguments[1]);
+        return PersistanceStore.SetKey(Arguments[0], persistanceData);
     }
 }

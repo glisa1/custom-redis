@@ -1,9 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 
-namespace RedisLite;
+namespace RedisLite.Persistance;
 
-internal static class Persistance
+internal static class PersistanceStore
 {
     private readonly static ConcurrentDictionary<string, object> keyValuePairs = new ConcurrentDictionary<string, object>();
 

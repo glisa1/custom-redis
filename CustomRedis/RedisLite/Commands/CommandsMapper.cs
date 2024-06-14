@@ -20,9 +20,9 @@ public static class CommandsMapper
 
         var commandLower = command.ToLower();
 
-        if (commandLower == "set" && commandAndArguments.Count > 2) 
+        if (commandLower == "set" && commandAndArguments.Count > 3) 
         {
-            commandLower += commandAndArguments[1].ToLower();
+            commandLower += ' ' + commandAndArguments[commandAndArguments.Count - 2].ToLower();
         }
 
         var commandType = CommandsMap.GetValueOrDefault(commandLower);
