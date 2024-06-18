@@ -51,7 +51,7 @@ public static class CommandsMapper
         { "set", typeof(SetCommand) },
         { "set ex", typeof(SetExCommand) },
         { "set px", typeof(SetPxCommand) },
-        { "set eaxt", typeof(SetEaxtCommand) },
+        { "set exat", typeof(SetExatCommand) },
         { "set pxat", typeof(SetPxatCommand) },
         { "get", typeof(GetCommand) },
     };

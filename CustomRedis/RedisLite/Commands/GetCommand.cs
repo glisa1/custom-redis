@@ -19,10 +19,9 @@ internal class GetCommand : Command
             return value!;
         }
 
-        if (value.ExpiryDate != null && value.ExpiryDate < DateTime.Now)
+        if (value.ExpiryDate != null && value.ExpiryDate < DateTime.UtcNow)
         {
             return null;
-            //Do we need to delete the key and value?
         }
 
         return value.PersistedData.ToString()!.ToCharArray();

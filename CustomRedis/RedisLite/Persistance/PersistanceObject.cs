@@ -14,6 +14,12 @@ internal sealed class PersistanceObject
     public PersistanceObject(object data, int seconds = 0, int miliseconds = 0)
     {
         PersistedData = data;
-        ExpiryDate = DateTime.Now.AddSeconds(seconds).AddMilliseconds(miliseconds);
+        ExpiryDate = DateTime.UtcNow.AddSeconds(seconds).AddMilliseconds(miliseconds);
+    }
+
+    public PersistanceObject(object data, DateTimeOffset dateTimeOffset)
+    {
+        PersistedData = data;
+        ExpiryDate = dateTimeOffset.DateTime;
     }
 }

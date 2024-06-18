@@ -210,6 +210,89 @@ public class ServerTests
         Assert.Equal(RESPConstants.NullValues[0], getResponseString);
     }
 
+    [Fact]
+    public async void OnSendingSetExatCommand_Passes_WhenReadingTheDataNotExpired()
+    {
+        DateTimeOffset dateTimeOffset = DateTimeOffset.UtcNow.AddSeconds(10);
+        var seconds = dateTimeOffset.ToUnixTimeSeconds();
+        var secondsLength = seconds.ToString().Length;
+
+        var httpContentCreate = CreateStringContent($"*5\r\n$3\r\nset\r\n$8\r\nTestExat\r\n$4\r\nBrad\r\n$4\r\nexat\r\n${secondsLength}\r\n{seconds}\r\n");
+        var httpContentGet = CreateStringContent("*2\r\n$3\r\nget\r\n$8\r\nTestExat\r\n");
+
+        var createResponse = await client.PostAsync(_rediLiteAddress, httpContentCreate);
+        var createResponseString = await createResponse.Content.ReadAsStringAsync();
+
+        var getResponse = await client.PostAsync(_rediLiteAddress, httpContentGet);
+        var getResponseString = await getResponse.Content.ReadAsStringAsync();
+
+        Assert.Equal(RESPConstants.OkResponse, createResponseString);
+        Assert.Equal("$4\r\nBrad\r\n", getResponseString);
+    }
+
+    [Fact]
+    public async void OnSendingSetPxatCommand_Passes_WhenReadingTheDataNotExpired()
+    {
+        DateTimeOffset dateTimeOffset = DateTimeOffset.UtcNow.AddMilliseconds(10000);
+        var milliseconds = dateTimeOffset.ToUnixTimeMilliseconds();
+        var millisecondsLength = milliseconds.ToString().Length;
+
+        var httpContentCreate = CreateStringContent($"*5\r\n$3\r\nset\r\n$8\r\nTestPxat\r\n$4\r\nBrad\r\n$4\r\npxat\r\n${millisecondsLength}\r\n{milliseconds}\r\n");
+        var httpContentGet = CreateStringContent("*2\r\n$3\r\nget\r\n$8\r\nTestPxat\r\n");
+
+        var createResponse = await client.PostAsync(_rediLiteAddress, httpContentCreate);
+        var createResponseString = await createResponse.Content.ReadAsStringAsync();
+
+        var getResponse = await client.PostAsync(_rediLiteAddress, httpContentGet);
+        var getResponseString = await getResponse.Content.ReadAsStringAsync();
+
+        Assert.Equal(RESPConstants.OkResponse, createResponseString);
+        Assert.Equal("$4\r\nBrad\r\n", getResponseString);
+    }
+
+    [Fact]
+    public async void OnSendingSetExatCommand_Fails_WhenReadingTheExpiredData()
+    {
+        DateTimeOffset dateTimeOffset = DateTimeOffset.UtcNow.AddSeconds(1);
+        var seconds = dateTimeOffset.ToUnixTimeSeconds();
+        var secondsLength = seconds.ToString().Length;
+
+        var httpContentCreate = CreateStringContent($"*5\r\n$3\r\nset\r\n$8\r\nTestExat\r\n$4\r\nBrad\r\n$4\r\nexat\r\n${secondsLength}\r\n{seconds}\r\n");
+        var httpContentGet = CreateStringContent("*2\r\n$3\r\nget\r\n$8\r\nTestExat\r\n");
+
+        var createResponse = await client.PostAsync(_rediLiteAddress, httpContentCreate);
+        var createResponseString = await createResponse.Content.ReadAsStringAsync();
+
+        // Making sure that the data is expired.
+        Thread.Sleep(1000);
+
+        var getResponse = await client.PostAsync(_rediLiteAddress, httpContentGet);
+        var getResponseString = await getResponse.Content.ReadAsStringAsync();
+
+        Assert.Equal(RESPConstants.OkResponse, createResponseString);
+        Assert.Equal(RESPConstants.NullValues[0], getResponseString);
+    }
+
+    [Fact]
+    public async void OnSendingSetPxatCommand_Fails_WhenReadingTheExpiredData()
+    {
+        DateTimeOffset dateTimeOffset = DateTimeOffset.UtcNow.AddMilliseconds(1);
+        var milliseconds = dateTimeOffset.ToUnixTimeMilliseconds();
+        var millisecondsLength = milliseconds.ToString().Length;
+
+        var httpContentCreate = CreateStringContent($"*5\r\n$3\r\nset\r\n$8\r\nTestPxat\r\n$4\r\nBrad\r\n$4\r\npxat\r\n${millisecondsLength}\r\n{milliseconds}\r\n");
+        var httpContentGet = CreateStringContent("*2\r\n$3\r\nget\r\n$8\r\nTestPxat\r\n");
+
+        var createResponse = await client.PostAsync(_rediLiteAddress, httpContentCreate);
+        var createResponseString = await createResponse.Content.ReadAsStringAsync();
+
+        var getResponse = await client.PostAsync(_rediLiteAddress, httpContentGet);
+        var getResponseString = await getResponse.Content.ReadAsStringAsync();
+
+        Assert.Equal(RESPConstants.OkResponse, createResponseString);
+        Assert.Equal(RESPConstants.NullValues[0], getResponseString);
+    }
+
     private StringContent CreateStringContent(string message)
     {
         var stringPayload = JsonConvert.SerializeObject(new { message });
