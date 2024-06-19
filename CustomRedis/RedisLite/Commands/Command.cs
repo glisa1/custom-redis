@@ -4,7 +4,7 @@ public abstract class Command
 {
     public Command(List<string> args)
     {
-        if (args.Count != NumberOfExpectedArguments)
+        if (args.Count < NumberOfExpectedArguments)
         {
             throw new ArgumentException($"Number of provided arguments is invalid. Expected {NumberOfExpectedArguments} and got {args.Count} arguments.");
         }

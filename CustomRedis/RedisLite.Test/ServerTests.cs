@@ -203,6 +203,9 @@ public class ServerTests
         var createResponse = await client.PostAsync(_rediLiteAddress, httpContentCreate);
         var createResponseString = await createResponse.Content.ReadAsStringAsync();
 
+        // Making sure that the data is expired.
+        Thread.Sleep(10);
+
         var getResponse = await client.PostAsync(_rediLiteAddress, httpContentGet);
         var getResponseString = await getResponse.Content.ReadAsStringAsync();
 
@@ -291,6 +294,96 @@ public class ServerTests
 
         Assert.Equal(RESPConstants.OkResponse, createResponseString);
         Assert.Equal(RESPConstants.NullValues[0], getResponseString);
+    }
+
+    [Fact]
+    public async void OnSendingExistsCommand_Passes_WhenKeyDoesNotExist()
+    {
+        var httpContentExists = CreateStringContent("*2\r\n$6\r\nexists\r\n$5\r\nNoKey\r\n");
+
+        var existsResponse = await client.PostAsync(_rediLiteAddress, httpContentExists);
+        var existsResponseString = await existsResponse.Content.ReadAsStringAsync();
+
+        Assert.Equal(":0\r\n", existsResponseString);
+    }
+
+    [Fact]
+    public async void OnSendingExistsCommand_Passes_WhenKeyExist()
+    {
+        var httpContentCreate = CreateStringContent("*3\r\n$3\r\nset\r\n$9\r\nKeyExists\r\n$4\r\nBrad\r\n");
+        var httpContentExists = CreateStringContent("*2\r\n$6\r\nexists\r\n$9\r\nKeyExists\r\n");
+
+        var createResponse = await client.PostAsync(_rediLiteAddress, httpContentCreate);
+        var createResponseString = await createResponse.Content.ReadAsStringAsync();
+
+        var existsResponse = await client.PostAsync(_rediLiteAddress, httpContentExists);
+        var existsResponseString = await existsResponse.Content.ReadAsStringAsync();
+
+        Assert.Equal(RESPConstants.OkResponse, createResponseString);
+        Assert.Equal(":1\r\n", existsResponseString);
+    }
+
+    [Fact]
+    public async void OnSendingDeleteCommand_Passes_WhenKeyDoesNotExist()
+    {
+        var httpContentDelete = CreateStringContent("*2\r\n$3\r\ndel\r\n$5\r\nNoKey\r\n");
+
+        var deleteResponse = await client.PostAsync(_rediLiteAddress, httpContentDelete);
+        var deleteResponseString = await deleteResponse.Content.ReadAsStringAsync();
+
+        Assert.Equal(":0\r\n", deleteResponseString);
+    }
+
+    [Fact]
+    public async void OnSendingDeleteCommand_Passes_WhenMulitpleKeysExists()
+    {
+        var httpContentCreate = CreateStringContent("*3\r\n$3\r\nset\r\n$12\r\nDelKeyExists\r\n$4\r\nBrad\r\n");
+        var httpContentCreate1 = CreateStringContent("*3\r\n$3\r\nset\r\n$13\r\nDelKeyExists1\r\n$4\r\nBrad\r\n");
+        var httpContentCreate2 = CreateStringContent("*3\r\n$3\r\nset\r\n$13\r\nDelKeyExists2\r\n$4\r\nBrad\r\n");
+        var httpContentDelete = CreateStringContent("*4\r\n$3\r\ndel\r\n$12\r\nDelKeyExists\r\n$13\r\nDelKeyExists1\r\n$13\r\nDelKeyExists2\r\n");
+
+        var createResponse = await client.PostAsync(_rediLiteAddress, httpContentCreate);
+        var createResponseString = await createResponse.Content.ReadAsStringAsync();
+
+        var createResponse1 = await client.PostAsync(_rediLiteAddress, httpContentCreate1);
+        var createResponseString1 = await createResponse1.Content.ReadAsStringAsync();
+
+        var createResponse2 = await client.PostAsync(_rediLiteAddress, httpContentCreate2);
+        var createResponseString2 = await createResponse2.Content.ReadAsStringAsync();
+
+        var deleteResponse = await client.PostAsync(_rediLiteAddress, httpContentDelete);
+        var deleteResponseString = await deleteResponse.Content.ReadAsStringAsync();
+
+        Assert.Equal(RESPConstants.OkResponse, createResponseString);
+        Assert.Equal(RESPConstants.OkResponse, createResponseString1);
+        Assert.Equal(RESPConstants.OkResponse, createResponseString2);
+        Assert.Equal(":3\r\n", deleteResponseString);
+    }
+
+    [Fact]
+    public async void OnSendingDeleteCommand_Passes_WhenSomeKeysExistsAndSomeDoNot()
+    {
+        var httpContentCreate = CreateStringContent("*3\r\n$3\r\nset\r\n$13\r\nDelKeyExists4\r\n$4\r\nBrad\r\n");
+        var httpContentCreate1 = CreateStringContent("*3\r\n$3\r\nset\r\n$13\r\nDelKeyExists5\r\n$4\r\nBrad\r\n");
+        var httpContentCreate2 = CreateStringContent("*3\r\n$3\r\nset\r\n$13\r\nDelKeyExists6\r\n$4\r\nBrad\r\n");
+        var httpContentDelete = CreateStringContent("*6\r\n$3\r\ndel\r\n$13\r\nDelKeyExists4\r\n$13\r\nDelKeyExists5\r\n$13\r\nDelKeyExists6\r\n$8\r\nNotFound\r\n$9\r\nNotFound1\r\n");
+
+        var createResponse = await client.PostAsync(_rediLiteAddress, httpContentCreate);
+        var createResponseString = await createResponse.Content.ReadAsStringAsync();
+
+        var createResponse1 = await client.PostAsync(_rediLiteAddress, httpContentCreate1);
+        var createResponseString1 = await createResponse1.Content.ReadAsStringAsync();
+
+        var createResponse2 = await client.PostAsync(_rediLiteAddress, httpContentCreate2);
+        var createResponseString2 = await createResponse2.Content.ReadAsStringAsync();
+
+        var deleteResponse = await client.PostAsync(_rediLiteAddress, httpContentDelete);
+        var deleteResponseString = await deleteResponse.Content.ReadAsStringAsync();
+
+        Assert.Equal(RESPConstants.OkResponse, createResponseString);
+        Assert.Equal(RESPConstants.OkResponse, createResponseString1);
+        Assert.Equal(RESPConstants.OkResponse, createResponseString2);
+        Assert.Equal(":3\r\n", deleteResponseString);
     }
 
     private StringContent CreateStringContent(string message)

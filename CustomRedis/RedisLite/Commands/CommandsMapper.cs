@@ -54,5 +54,7 @@ public static class CommandsMapper
         { "set exat", typeof(SetExatCommand) },
         { "set pxat", typeof(SetPxatCommand) },
         { "get", typeof(GetCommand) },
+        { "exists", typeof(ExistsCommand) },
+        { "del", typeof(DeleteCommand) },
     };
 }

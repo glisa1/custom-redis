@@ -21,15 +21,13 @@ internal static class PersistanceStore
 
     public static object? GetValue(string key)
     {
-        try
-        {
-            keyValuePairs.TryGetValue(key, out var value);
+        keyValuePairs.TryGetValue(key, out var value);
 
-            return value;
-        }
-        catch
-        {
-            throw;
-        }
+        return value;
+    }
+
+    public static bool DeleteKey(string key)
+    {
+        return keyValuePairs.TryRemove(key, out var value);
     }
 }
