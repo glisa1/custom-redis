@@ -13,7 +13,15 @@ internal class SetExCommand : Command
     public override string CommandName => "set ex";
     public override object Execute()
     {
-        var persistanceData = new PersistanceObject(Arguments[1], seconds: int.Parse(Arguments[Arguments.Count - 1]));
-        return PersistanceStore.SetKey(Arguments[0], persistanceData);
+        try
+        {
+            var persistanceData = new PersistanceObject(Arguments[1], seconds: int.Parse(Arguments[Arguments.Count - 1]));
+            PersistanceStore.SetKey(Arguments[0], persistanceData);
+            return "OK";
+        }
+        catch (Exception ex)
+        {
+            return ex;
+        }
     }
 }

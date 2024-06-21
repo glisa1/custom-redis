@@ -56,5 +56,7 @@ public static class CommandsMapper
         { "get", typeof(GetCommand) },
         { "exists", typeof(ExistsCommand) },
         { "del", typeof(DeleteCommand) },
+        { "incr", typeof(IncrementCommand) },
+        { "decr", typeof(DecrementCommand) },
     };
 }

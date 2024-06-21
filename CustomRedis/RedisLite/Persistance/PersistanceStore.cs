@@ -8,15 +8,7 @@ internal static class PersistanceStore
 
     public static object SetKey(string key, object value)
     {
-        try
-        {
-            keyValuePairs.AddOrUpdate(key, value, (key, oldValue) => value);
-            return "OK";
-        }
-        catch (Exception ex)
-        {
-            return ex;
-        }
+        return keyValuePairs.AddOrUpdate(key, value, (key, oldValue) => value);
     }
 
     public static object? GetValue(string key)

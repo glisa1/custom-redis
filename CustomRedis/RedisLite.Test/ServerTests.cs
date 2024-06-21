@@ -386,6 +386,142 @@ public class ServerTests
         Assert.Equal(":3\r\n", deleteResponseString);
     }
 
+    [Fact]
+    public async void OnSendingIncrCommand_Passes_WhenTheValueIsIncremented()
+    {
+        var setHttpContent = CreateStringContent("*3\r\n$3\r\nset\r\n$14\r\nSetForIncrName\r\n$1\r\n1\r\n");
+        var incrHttpContent = CreateStringContent("*2\r\n$4\r\nincr\r\n$14\r\nSetForIncrName\r\n");
+        var expectedResult1 = "+(integer) 2\r\n";
+        var expectedResult2 = "+(integer) 3\r\n";
+
+        var setResponse = await client.PostAsync(_rediLiteAddress, setHttpContent);
+        var setResponseString = await setResponse.Content.ReadAsStringAsync();
+
+        var incrResponse1 = await client.PostAsync(_rediLiteAddress, incrHttpContent);
+        var incrResponseString1 = await incrResponse1.Content.ReadAsStringAsync();
+
+        var incrResponse2 = await client.PostAsync(_rediLiteAddress, incrHttpContent);
+        var incrResponseString2 = await incrResponse2.Content.ReadAsStringAsync();
+
+        Assert.Equal(RESPConstants.OkResponse, setResponseString);
+        Assert.Equal(expectedResult1, incrResponseString1);
+        Assert.Equal(expectedResult2, incrResponseString2);
+    }
+
+    [Fact]
+    public async void OnSendingIncrCommand_Fails_WhenTheValueIsNotInteger()
+    {
+        var setHttpContent = CreateStringContent("*3\r\n$3\r\nset\r\n$13\r\nIncrNotString\r\n$4\r\ntest\r\n");
+        var incrHttpContent = CreateStringContent("*2\r\n$4\r\nincr\r\n$13\r\nIncrNotString\r\n");
+        var expectedResult = "-The value is not an integer or out of range.\r\n";
+
+        var setResponse = await client.PostAsync(_rediLiteAddress, setHttpContent);
+        var setResponseString = await setResponse.Content.ReadAsStringAsync();
+
+        var incrResponse = await client.PostAsync(_rediLiteAddress, incrHttpContent);
+        var incrResponseString = await incrResponse.Content.ReadAsStringAsync();
+
+        Assert.Equal(RESPConstants.OkResponse, setResponseString);
+        Assert.Equal(expectedResult, incrResponseString);
+    }
+
+    [Fact]
+    public async void OnSendingIncrCommand_Passes_WhenTheKeyPreviouslyNotExists()
+    {
+        var incrHttpContent = CreateStringContent("*2\r\n$4\r\nincr\r\n$12\r\nIncrNotFound\r\n");
+        var expectedResult = "+(integer) 1\r\n";
+
+        var incrResponse = await client.PostAsync(_rediLiteAddress, incrHttpContent);
+        var incrResponseString = await incrResponse.Content.ReadAsStringAsync();
+
+        Assert.Equal(expectedResult, incrResponseString);
+    }
+
+    [Fact]
+    public async void OnSendingIncrCommand_Fails_WhenValueIsTooLarge()
+    {
+        var setHttpContent = CreateStringContent("*3\r\n$3\r\nset\r\n$18\r\nIncrOverflowString\r\n$30\r\n234293482390480948029348230948\r\n");
+        var incrHttpContent = CreateStringContent("*2\r\n$4\r\nincr\r\n$18\r\nIncrOverflowString\r\n");
+        var expectedResult = "-The value is not an integer or out of range.\r\n";
+
+        var setResponse = await client.PostAsync(_rediLiteAddress, setHttpContent);
+        var setResponseString = await setResponse.Content.ReadAsStringAsync();
+
+        var incrResponse = await client.PostAsync(_rediLiteAddress, incrHttpContent);
+        var incrResponseString = await incrResponse.Content.ReadAsStringAsync();
+
+        Assert.Equal(RESPConstants.OkResponse, setResponseString);
+        Assert.Equal(expectedResult, incrResponseString);
+    }
+
+    [Fact]
+    public async void OnSendingDecrCommand_Passes_WhenTheValueIsIncremented()
+    {
+        var setHttpContent = CreateStringContent("*3\r\n$3\r\nset\r\n$14\r\nSetForDecrName\r\n$1\r\n3\r\n");
+        var incrHttpContent = CreateStringContent("*2\r\n$4\r\ndecr\r\n$14\r\nSetForDecrName\r\n");
+        var expectedResult1 = "+(integer) 2\r\n";
+        var expectedResult2 = "+(integer) 1\r\n";
+
+        var setResponse = await client.PostAsync(_rediLiteAddress, setHttpContent);
+        var setResponseString = await setResponse.Content.ReadAsStringAsync();
+
+        var incrResponse1 = await client.PostAsync(_rediLiteAddress, incrHttpContent);
+        var incrResponseString1 = await incrResponse1.Content.ReadAsStringAsync();
+
+        var incrResponse2 = await client.PostAsync(_rediLiteAddress, incrHttpContent);
+        var incrResponseString2 = await incrResponse2.Content.ReadAsStringAsync();
+
+        Assert.Equal(RESPConstants.OkResponse, setResponseString);
+        Assert.Equal(expectedResult1, incrResponseString1);
+        Assert.Equal(expectedResult2, incrResponseString2);
+    }
+
+    [Fact]
+    public async void OnSendingDecrCommand_Fails_WhenTheValueIsNotInteger()
+    {
+        var setHttpContent = CreateStringContent("*3\r\n$3\r\nset\r\n$13\r\nDecrNotString\r\n$4\r\ntest\r\n");
+        var incrHttpContent = CreateStringContent("*2\r\n$4\r\ndecr\r\n$13\r\nDecrNotString\r\n");
+        var expectedResult = "-The value is not an integer or out of range.\r\n";
+
+        var setResponse = await client.PostAsync(_rediLiteAddress, setHttpContent);
+        var setResponseString = await setResponse.Content.ReadAsStringAsync();
+
+        var incrResponse = await client.PostAsync(_rediLiteAddress, incrHttpContent);
+        var incrResponseString = await incrResponse.Content.ReadAsStringAsync();
+
+        Assert.Equal(RESPConstants.OkResponse, setResponseString);
+        Assert.Equal(expectedResult, incrResponseString);
+    }
+
+    [Fact]
+    public async void OnSendingDecrCommand_Passes_WhenTheKeyPreviouslyNotExists()
+    {
+        var incrHttpContent = CreateStringContent("*2\r\n$4\r\ndecr\r\n$12\r\nDecrNotFound\r\n");
+        var expectedResult = "+(integer) -1\r\n";
+
+        var incrResponse = await client.PostAsync(_rediLiteAddress, incrHttpContent);
+        var incrResponseString = await incrResponse.Content.ReadAsStringAsync();
+
+        Assert.Equal(expectedResult, incrResponseString);
+    }
+
+    [Fact]
+    public async void OnSendingDecrCommand_Fails_WhenValueIsTooLarge()
+    {
+        var setHttpContent = CreateStringContent("*3\r\n$3\r\nset\r\n$18\r\nDecrOverflowString\r\n$30\r\n234293482390480948029348230948\r\n");
+        var incrHttpContent = CreateStringContent("*2\r\n$4\r\ndecr\r\n$18\r\nDecrOverflowString\r\n");
+        var expectedResult = "-The value is not an integer or out of range.\r\n";
+
+        var setResponse = await client.PostAsync(_rediLiteAddress, setHttpContent);
+        var setResponseString = await setResponse.Content.ReadAsStringAsync();
+
+        var incrResponse = await client.PostAsync(_rediLiteAddress, incrHttpContent);
+        var incrResponseString = await incrResponse.Content.ReadAsStringAsync();
+
+        Assert.Equal(RESPConstants.OkResponse, setResponseString);
+        Assert.Equal(expectedResult, incrResponseString);
+    }
+
     private StringContent CreateStringContent(string message)
     {
         var stringPayload = JsonConvert.SerializeObject(new { message });
