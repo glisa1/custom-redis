@@ -391,8 +391,8 @@ public class ServerTests
     {
         var setHttpContent = CreateStringContent("*3\r\n$3\r\nset\r\n$14\r\nSetForIncrName\r\n$1\r\n1\r\n");
         var incrHttpContent = CreateStringContent("*2\r\n$4\r\nincr\r\n$14\r\nSetForIncrName\r\n");
-        var expectedResult1 = "+(integer) 2\r\n";
-        var expectedResult2 = "+(integer) 3\r\n";
+        var expectedResult1 = ":2\r\n";
+        var expectedResult2 = ":3\r\n";
 
         var setResponse = await client.PostAsync(_rediLiteAddress, setHttpContent);
         var setResponseString = await setResponse.Content.ReadAsStringAsync();
@@ -429,7 +429,7 @@ public class ServerTests
     public async void OnSendingIncrCommand_Passes_WhenTheKeyPreviouslyNotExists()
     {
         var incrHttpContent = CreateStringContent("*2\r\n$4\r\nincr\r\n$12\r\nIncrNotFound\r\n");
-        var expectedResult = "+(integer) 1\r\n";
+        var expectedResult = ":1\r\n";
 
         var incrResponse = await client.PostAsync(_rediLiteAddress, incrHttpContent);
         var incrResponseString = await incrResponse.Content.ReadAsStringAsync();
@@ -459,8 +459,8 @@ public class ServerTests
     {
         var setHttpContent = CreateStringContent("*3\r\n$3\r\nset\r\n$14\r\nSetForDecrName\r\n$1\r\n3\r\n");
         var incrHttpContent = CreateStringContent("*2\r\n$4\r\ndecr\r\n$14\r\nSetForDecrName\r\n");
-        var expectedResult1 = "+(integer) 2\r\n";
-        var expectedResult2 = "+(integer) 1\r\n";
+        var expectedResult1 = ":2\r\n";
+        var expectedResult2 = ":1\r\n";
 
         var setResponse = await client.PostAsync(_rediLiteAddress, setHttpContent);
         var setResponseString = await setResponse.Content.ReadAsStringAsync();
@@ -497,7 +497,7 @@ public class ServerTests
     public async void OnSendingDecrCommand_Passes_WhenTheKeyPreviouslyNotExists()
     {
         var incrHttpContent = CreateStringContent("*2\r\n$4\r\ndecr\r\n$12\r\nDecrNotFound\r\n");
-        var expectedResult = "+(integer) -1\r\n";
+        var expectedResult = ":-1\r\n";
 
         var incrResponse = await client.PostAsync(_rediLiteAddress, incrHttpContent);
         var incrResponseString = await incrResponse.Content.ReadAsStringAsync();

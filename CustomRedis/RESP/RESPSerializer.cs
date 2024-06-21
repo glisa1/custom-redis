@@ -19,6 +19,8 @@ internal class RESPSerializer
                 messageContent = SerializeErrorType((Exception)messageObject);
             else if (messageObject is int)
                 messageContent = SerializeIntegerType((int)messageObject);
+            else if (messageObject is long)
+                messageContent= SerializeLongType((long)messageObject);
             else if (messageObject is ICollection<object>)
                 messageContent = SerializeArrayType((ICollection<object>)messageObject);
 
@@ -43,6 +45,11 @@ internal class RESPSerializer
     private string SerializeIntegerType(int integerType)
     {
         return $"{RESPConstants.IntegerType}{integerType}{RESPConstants.Terminator}";
+    }
+
+    private string SerializeLongType(long longType)
+    {
+        return $"{RESPConstants.IntegerType}{longType}{RESPConstants.Terminator}";
     }
 
     private string SerializeNull()

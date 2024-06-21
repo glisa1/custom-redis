@@ -21,13 +21,13 @@ internal sealed class IncrementCommand : Command
             if (value == null)
             {
                 PersistanceStore.SetKey(Arguments[0], new PersistanceObject(1));
-                return "(integer) 1";
+                return 1;
             }
 
             var intValue = Convert.ToInt64(value.PersistedData);
             var result = PersistanceStore.SetKey(Arguments[0], new PersistanceObject(++intValue));
 
-            return $"(integer) {intValue}";
+            return intValue;
         }
         catch
         {
