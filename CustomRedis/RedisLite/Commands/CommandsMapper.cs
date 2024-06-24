@@ -58,5 +58,7 @@ public static class CommandsMapper
         { "del", typeof(DeleteCommand) },
         { "incr", typeof(IncrementCommand) },
         { "decr", typeof(DecrementCommand) },
+        { "lpush", typeof(LPushCommand) },
+        { "rpush", typeof(RPushCommand) },
     };
 }

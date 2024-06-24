@@ -21,8 +21,8 @@ internal class RESPSerializer
                 messageContent = SerializeIntegerType((int)messageObject);
             else if (messageObject is long)
                 messageContent= SerializeLongType((long)messageObject);
-            else if (messageObject is ICollection<object>)
-                messageContent = SerializeArrayType((ICollection<object>)messageObject);
+            else if (messageObject is ICollection<string>)
+                messageContent = SerializeArrayType((ICollection<string>)messageObject);
 
             return new RESPMessage(messageContent, false);
         }
@@ -62,7 +62,7 @@ internal class RESPSerializer
         return $"{RESPConstants.BulkStringType}{bulkString.Length}{RESPConstants.Terminator}{new string(bulkString)}{RESPConstants.Terminator}";
     }
 
-    private string SerializeArrayType(ICollection<object> data)
+    private string SerializeArrayType(ICollection<string> data)
     {
         if (data.Count == 0)
         {
@@ -76,18 +76,18 @@ internal class RESPSerializer
 
         foreach (var item in data)
         {
-            if (item is null)
-                stringBuilder.Append(SerializeNull());
-            else if (item is int)
-                stringBuilder.Append(SerializeIntegerType((int)item));
-            else if (item is string)
+            //if (item is null)
+            //    stringBuilder.Append(SerializeNull());
+            //else if (item is int)
+            //    stringBuilder.Append(SerializeIntegerType((int)item));
+            //else if (item is string)
                 stringBuilder.Append(SerializeSimpleStringType((string)item));
-            else if (item is char[])
-                stringBuilder.Append(SerializeBulkStrings((char[])item));
-            else if (item is Exception)
-                stringBuilder.Append(SerializeErrorType((Exception)item));
-            else if (item is ICollection<object>)
-                stringBuilder.Append(SerializeArrayType((ICollection<object>)item));
+            //else if (item is char[])
+            //    stringBuilder.Append(SerializeBulkStrings((char[])item));
+            //else if (item is Exception)
+            //    stringBuilder.Append(SerializeErrorType((Exception)item));
+            //else if (item is ICollection<object>)
+            //    stringBuilder.Append(SerializeArrayType((ICollection<object>)item));
         }
 
         return stringBuilder.ToString();

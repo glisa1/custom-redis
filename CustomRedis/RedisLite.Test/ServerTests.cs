@@ -391,8 +391,8 @@ public class ServerTests
     {
         var setHttpContent = CreateStringContent("*3\r\n$3\r\nset\r\n$14\r\nSetForIncrName\r\n$1\r\n1\r\n");
         var incrHttpContent = CreateStringContent("*2\r\n$4\r\nincr\r\n$14\r\nSetForIncrName\r\n");
-        var expectedResult1 = ":2\r\n";
-        var expectedResult2 = ":3\r\n";
+        const string expectedResult1 = ":2\r\n";
+        const string expectedResult2 = ":3\r\n";
 
         var setResponse = await client.PostAsync(_rediLiteAddress, setHttpContent);
         var setResponseString = await setResponse.Content.ReadAsStringAsync();
@@ -460,7 +460,7 @@ public class ServerTests
         var setHttpContent = CreateStringContent("*3\r\n$3\r\nset\r\n$14\r\nSetForDecrName\r\n$1\r\n3\r\n");
         var incrHttpContent = CreateStringContent("*2\r\n$4\r\ndecr\r\n$14\r\nSetForDecrName\r\n");
         var expectedResult1 = ":2\r\n";
-        var expectedResult2 = ":1\r\n";
+        const string expectedResult2 = ":1\r\n";
 
         var setResponse = await client.PostAsync(_rediLiteAddress, setHttpContent);
         var setResponseString = await setResponse.Content.ReadAsStringAsync();
@@ -481,7 +481,7 @@ public class ServerTests
     {
         var setHttpContent = CreateStringContent("*3\r\n$3\r\nset\r\n$13\r\nDecrNotString\r\n$4\r\ntest\r\n");
         var incrHttpContent = CreateStringContent("*2\r\n$4\r\ndecr\r\n$13\r\nDecrNotString\r\n");
-        var expectedResult = "-The value is not an integer or out of range.\r\n";
+        const string expectedResult = "-The value is not an integer or out of range.\r\n";
 
         var setResponse = await client.PostAsync(_rediLiteAddress, setHttpContent);
         var setResponseString = await setResponse.Content.ReadAsStringAsync();
@@ -497,7 +497,7 @@ public class ServerTests
     public async void OnSendingDecrCommand_Passes_WhenTheKeyPreviouslyNotExists()
     {
         var incrHttpContent = CreateStringContent("*2\r\n$4\r\ndecr\r\n$12\r\nDecrNotFound\r\n");
-        var expectedResult = ":-1\r\n";
+        const string expectedResult = ":-1\r\n";
 
         var incrResponse = await client.PostAsync(_rediLiteAddress, incrHttpContent);
         var incrResponseString = await incrResponse.Content.ReadAsStringAsync();
@@ -510,7 +510,7 @@ public class ServerTests
     {
         var setHttpContent = CreateStringContent("*3\r\n$3\r\nset\r\n$18\r\nDecrOverflowString\r\n$30\r\n234293482390480948029348230948\r\n");
         var incrHttpContent = CreateStringContent("*2\r\n$4\r\ndecr\r\n$18\r\nDecrOverflowString\r\n");
-        var expectedResult = "-The value is not an integer or out of range.\r\n";
+        const string expectedResult = "-The value is not an integer or out of range.\r\n";
 
         var setResponse = await client.PostAsync(_rediLiteAddress, setHttpContent);
         var setResponseString = await setResponse.Content.ReadAsStringAsync();
@@ -520,6 +520,94 @@ public class ServerTests
 
         Assert.Equal(RESPConstants.OkResponse, setResponseString);
         Assert.Equal(expectedResult, incrResponseString);
+    }
+
+    [Fact]
+    public async void OnSendingLpushCommand_Passes_WhenValueIsAppendedToList()
+    {
+        var lpushHttpContent = CreateStringContent("*3\r\n$5\r\nlpush\r\n$8\r\nlpushkey\r\n$5\r\ntest1\r\n");
+        var lpushHttpContent1 = CreateStringContent("*3\r\n$5\r\nlpush\r\n$8\r\nlpushkey\r\n$5\r\ntest2\r\n");
+        var lpushHttpContent2 = CreateStringContent("*3\r\n$5\r\nlpush\r\n$8\r\nlpushkey\r\n$5\r\ntest3\r\n");
+        var httpContentGet = CreateStringContent("*2\r\n$3\r\nget\r\n$8\r\nlpushkey\r\n");
+        const string expectedListResult = "*3\r\n$5\r\ntest3\r\n$5\r\ntest2\r\n$5\r\ntest1\r\n";
+
+        var response = await client.PostAsync(_rediLiteAddress, lpushHttpContent);
+        var lpushResponseString = await response.Content.ReadAsStringAsync();
+
+        response = await client.PostAsync(_rediLiteAddress, lpushHttpContent1);
+        var lpushResponseString2 = await response.Content.ReadAsStringAsync();
+
+        response = await client.PostAsync(_rediLiteAddress, lpushHttpContent2);
+        var lpushResponseString3 = await response.Content.ReadAsStringAsync();
+
+        response = await client.PostAsync(_rediLiteAddress, httpContentGet);
+        var getResponseString = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(":1\r\n", lpushResponseString);
+        Assert.Equal(":2\r\n", lpushResponseString2);
+        Assert.Equal(":3\r\n", lpushResponseString3);
+        Assert.Equal(expectedListResult, getResponseString);
+    }
+
+    [Fact]
+    public async void OnSendingLpushCommand_Fails_WhenValueIsNotAList()
+    {
+        var setHttpContent = CreateStringContent("*3\r\n$3\r\nset\r\n$12\r\nlpushnotlist\r\n$4\r\nBrad\r\n");
+        var lpushHttpContent = CreateStringContent("*3\r\n$5\r\nlpush\r\n$12\r\nlpushnotlist\r\n$4\r\ntest\r\n");
+        const string expectedError = "-The value is not a list.\r\n";
+
+        var setResponse = await client.PostAsync(_rediLiteAddress, setHttpContent);
+        var setResponseString = await setResponse.Content.ReadAsStringAsync();
+
+        var lpushResponse = await client.PostAsync(_rediLiteAddress, lpushHttpContent);
+        var lpushResponseString = await lpushResponse.Content.ReadAsStringAsync();
+
+        Assert.Equal(RESPConstants.OkResponse, setResponseString);
+        Assert.Equal(expectedError, lpushResponseString);
+    }
+
+    [Fact]
+    public async void OnSendingRpushCommand_Passes_WhenValueIsAppendedToList()
+    {
+        var rpushHttpContent = CreateStringContent("*3\r\n$5\r\nrpush\r\n$8\r\nrpushkey\r\n$5\r\ntest1\r\n");
+        var rpushHttpContent1 = CreateStringContent("*3\r\n$5\r\nrpush\r\n$8\r\nrpushkey\r\n$5\r\ntest2\r\n");
+        var rpushHttpContent2 = CreateStringContent("*3\r\n$5\r\nrpush\r\n$8\r\nrpushkey\r\n$5\r\ntest3\r\n");
+        var httpContentGet = CreateStringContent("*2\r\n$3\r\nget\r\n$8\r\nrpushkey\r\n");
+        const string expectedListResult = "*3\r\n$5\r\ntest1\r\n$5\r\ntest2\r\n$5\r\ntest3\r\n";
+
+        var response = await client.PostAsync(_rediLiteAddress, rpushHttpContent);
+        var rpushResponseString = await response.Content.ReadAsStringAsync();
+
+        response = await client.PostAsync(_rediLiteAddress, rpushHttpContent1);
+        var rpushResponseString2 = await response.Content.ReadAsStringAsync();
+
+        response = await client.PostAsync(_rediLiteAddress, rpushHttpContent2);
+        var rpushResponseString3 = await response.Content.ReadAsStringAsync();
+
+        response = await client.PostAsync(_rediLiteAddress, httpContentGet);
+        var getResponseString = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(":1\r\n", rpushResponseString);
+        Assert.Equal(":2\r\n", rpushResponseString2);
+        Assert.Equal(":3\r\n", rpushResponseString3);
+        Assert.Equal(expectedListResult, getResponseString);
+    }
+
+    [Fact]
+    public async void OnSendingRpushCommand_Fails_WhenValueIsNotAList()
+    {
+        var setHttpContent = CreateStringContent("*3\r\n$3\r\nset\r\n$12\r\nrpushnotlist\r\n$4\r\nBrad\r\n");
+        var lpushHttpContent = CreateStringContent("*3\r\n$5\r\nrpush\r\n$12\r\nrpushnotlist\r\n$4\r\ntest\r\n");
+        const string expectedError = "-The value is not a list.\r\n";
+
+        var setResponse = await client.PostAsync(_rediLiteAddress, setHttpContent);
+        var setResponseString = await setResponse.Content.ReadAsStringAsync();
+
+        var lpushResponse = await client.PostAsync(_rediLiteAddress, lpushHttpContent);
+        var lpushResponseString = await lpushResponse.Content.ReadAsStringAsync();
+
+        Assert.Equal(RESPConstants.OkResponse, setResponseString);
+        Assert.Equal(expectedError, lpushResponseString);
     }
 
     private StringContent CreateStringContent(string message)

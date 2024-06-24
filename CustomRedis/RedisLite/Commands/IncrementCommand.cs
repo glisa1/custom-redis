@@ -17,15 +17,16 @@ internal sealed class IncrementCommand : Command
     {
         try
         {
-            var value = PersistanceStore.GetValue(Arguments[0]) as PersistanceObject;
+            var key = Arguments[0];
+            var value = PersistanceStore.GetValue(key) as PersistanceObject;
             if (value == null)
             {
-                PersistanceStore.SetKey(Arguments[0], new PersistanceObject(1));
+                PersistanceStore.SetKey(key, new PersistanceObject("1"));
                 return 1;
             }
 
             var intValue = Convert.ToInt64(value.PersistedData);
-            var result = PersistanceStore.SetKey(Arguments[0], new PersistanceObject(++intValue));
+            var result = PersistanceStore.SetKey(key, new PersistanceObject((++intValue).ToString()));
 
             return intValue;
         }

@@ -24,6 +24,11 @@ internal class GetCommand : Command
             return null;
         }
 
+        if (value.PersistedData is ICollection<string>)
+        {
+            return value.PersistedData;
+        }
+
         return value.PersistedData.ToString()!.ToCharArray();
     }
 }
