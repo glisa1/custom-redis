@@ -73,12 +73,12 @@
 
         public static IEnumerable<object[]> ArrayTypeData()
         {
-            yield return new object[] { new List<object?> { "hello".ToCharArray(), "world".ToCharArray() }, "*2\r\n$5\r\nhello\r\n$5\r\nworld\r\n" };
+            yield return new object[] { new List<object?> { "hello", "world" }, "*2\r\n$5\r\nhello\r\n$5\r\nworld\r\n" };
             yield return new object[] { new List<object?> { 1, 2, 3 }, "*3\r\n:1\r\n:2\r\n:3\r\n" };
-            yield return new object[] { new List<object?> { 1, 2, 3, 4, "hello".ToCharArray() }, "*5\r\n:1\r\n:2\r\n:3\r\n:4\r\n$5\r\nhello\r\n" };
-            yield return new object[] { new List<object?> { "hello".ToCharArray(), null, "world".ToCharArray() }, "*3\r\n$5\r\nhello\r\n$-1\r\n$5\r\nworld\r\n" };
-            yield return new object[] { new List<object?> { "ping".ToCharArray() }, "*1\r\n$4\r\nping\r\n" };
-            yield return new object[] { new List<object?> { new List<object?> { 1, 2, 3 }, new List<object?> { "Hello", new Exception("World") } }, "*2\r\n*3\r\n:1\r\n:2\r\n:3\r\n*2\r\n+Hello\r\n-World\r\n" };
+            yield return new object[] { new List<object?> { 1, 2, 3, 4, "hello" }, "*5\r\n:1\r\n:2\r\n:3\r\n:4\r\n$5\r\nhello\r\n" };
+            yield return new object[] { new List<object?> { "hello", null, "world" }, "*3\r\n$5\r\nhello\r\n$-1\r\n$5\r\nworld\r\n" };
+            yield return new object[] { new List<object?> { "ping" }, "*1\r\n$4\r\nping\r\n" };
+            yield return new object[] { new List<object?> { new List<object?> { 1, 2, 3 }, new List<object?> { "Hello", new Exception("World") } }, "*2\r\n*3\r\n:1\r\n:2\r\n:3\r\n*2\r\n$5\r\nHello\r\n-World\r\n" };
         }
     }
 }

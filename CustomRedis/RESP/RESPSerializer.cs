@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections;
+using System.Text;
 
 namespace RESP;
 
@@ -11,18 +12,18 @@ internal class RESPSerializer
             var messageContent = string.Empty;
             if (messageObject == null)
                 messageContent = SerializeNull();
-            else if (messageObject is string)
-                messageContent = SerializeSimpleStringType((string)messageObject);
-            else if (messageObject is char[])
-                messageContent = SerializeBulkStrings((char[])messageObject);
-            else if (messageObject is Exception)
-                messageContent = SerializeErrorType((Exception)messageObject);
-            else if (messageObject is int)
-                messageContent = SerializeIntegerType((int)messageObject);
-            else if (messageObject is long)
-                messageContent= SerializeLongType((long)messageObject);
-            else if (messageObject is ICollection<string>)
-                messageContent = SerializeArrayType((ICollection<string>)messageObject);
+            else if (messageObject is string stringValue)
+                messageContent = SerializeSimpleStringType(stringValue);
+            else if (messageObject is char[] charArrayValue)
+                messageContent = SerializeBulkStrings(charArrayValue);
+            else if (messageObject is Exception exceptionValue)
+                messageContent = SerializeErrorType(exceptionValue);
+            else if (messageObject is int intValue)
+                messageContent = SerializeIntegerType(intValue);
+            else if (messageObject is long longValue)
+                messageContent= SerializeLongType(longValue);
+            else if (messageObject is ICollection collectionValue)
+                messageContent = SerializeArrayType(collectionValue);
 
             return new RESPMessage(messageContent, false);
         }
@@ -62,7 +63,7 @@ internal class RESPSerializer
         return $"{RESPConstants.BulkStringType}{bulkString.Length}{RESPConstants.Terminator}{new string(bulkString)}{RESPConstants.Terminator}";
     }
 
-    private string SerializeArrayType(ICollection<string> data)
+    private string SerializeArrayType(ICollection data)
     {
         if (data.Count == 0)
         {
@@ -76,18 +77,18 @@ internal class RESPSerializer
 
         foreach (var item in data)
         {
-            //if (item is null)
-            //    stringBuilder.Append(SerializeNull());
-            //else if (item is int)
-            //    stringBuilder.Append(SerializeIntegerType((int)item));
-            //else if (item is string)
-                stringBuilder.Append(SerializeSimpleStringType((string)item));
-            //else if (item is char[])
-            //    stringBuilder.Append(SerializeBulkStrings((char[])item));
-            //else if (item is Exception)
-            //    stringBuilder.Append(SerializeErrorType((Exception)item));
-            //else if (item is ICollection<object>)
-            //    stringBuilder.Append(SerializeArrayType((ICollection<object>)item));
+            if (item is null)
+                stringBuilder.Append(SerializeNull());
+            else if (item is int intItem)
+                stringBuilder.Append(SerializeIntegerType(intItem));
+            else if (item is string stringItem)
+                stringBuilder.Append(SerializeBulkStrings(stringItem.ToCharArray()));
+            else if (item is char[] charItem)
+                stringBuilder.Append(SerializeBulkStrings(charItem));
+            else if (item is Exception exceptionItem)
+                stringBuilder.Append(SerializeErrorType(exceptionItem));
+            else if (item is ICollection collectionItem)
+                stringBuilder.Append(SerializeArrayType(collectionItem));
         }
 
         return stringBuilder.ToString();

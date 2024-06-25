@@ -1,5 +1,6 @@
 ﻿using RedisLite.Persistance;
 using RESP;
+using System.Collections;
 
 namespace RedisLite.Commands;
 
@@ -24,7 +25,7 @@ internal class GetCommand : Command
             return null;
         }
 
-        if (value.PersistedData is ICollection<string>)
+        if (value.PersistedData is ICollection)
         {
             return value.PersistedData;
         }
