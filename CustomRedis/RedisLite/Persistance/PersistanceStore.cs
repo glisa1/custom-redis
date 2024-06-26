@@ -22,4 +22,9 @@ internal static class PersistanceStore
     {
         return keyValuePairs.TryRemove(key, out var value);
     }
+
+    internal static List<KeyValuePair<string, object>> GetKeysAndValues()
+    {
+        return keyValuePairs.Select(keyValuePair => keyValuePair).ToList();
+    }
 }
