@@ -27,5 +27,7 @@ jobs:
       working-directory: ./CustomRedis
     - name: Build
       run: dotnet build --no-restore
+      working-directory: ./CustomRedis
     - name: Test
       run: dotnet test --no-build --verbosity normal
+      working-directory: ./CustomRedis
