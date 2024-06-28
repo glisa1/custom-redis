@@ -21,10 +21,10 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Print ls
-      run: ls
+      run: echo ls
     - name: Restore dependencies
       run: dotnet restore
-      working-directory: src/CustomRedis
+      working-directory: ../CustomRedis
     - name: Build
       run: dotnet build --no-restore
     - name: Test
