@@ -24,7 +24,7 @@ jobs:
       run: echo ls
     - name: Restore dependencies
       run: dotnet restore
-      working-directory: ../CustomRedis
+      working-directory: ./CustomRedis
     - name: Build
       run: dotnet build --no-restore
     - name: Test
