@@ -75,13 +75,13 @@ public class ServerTests
     [Fact]
     public async void OnSendingSetCommand_Passes_WhenTheValueIsSaved()
     {
-        var httpContent = CreateStringContent("*3\r\n$3\r\nset\r\n$7\r\nSetName\r\n$4\r\nBrad\r\n");
+        var setHttpContent = CreateStringContent("*3\r\n$3\r\nset\r\n$7\r\nSetName\r\n$4\r\nBrad\r\n");
 
-        var response = await client.PostAsync(_rediLiteAddress, httpContent);
+        var setResponse = await client.PostAsync(_rediLiteAddress, setHttpContent);
 
-        var responseString = await response.Content.ReadAsStringAsync();
+        var setResponseString = await setResponse.Content.ReadAsStringAsync();
 
-        Assert.Equal(RESPConstants.OkResponse, responseString);
+        Assert.Equal(RESPConstants.OkResponse, setResponseString);
     }
 
     [Fact]
@@ -608,6 +608,22 @@ public class ServerTests
 
         Assert.Equal(RESPConstants.OkResponse, setResponseString);
         Assert.Equal(expectedError, lpushResponseString);
+    }
+
+    [Fact]
+    public async void SaveTest()
+    {
+        var setHttpContent = CreateStringContent("*3\r\n$3\r\nset\r\n$14\r\nSetNameForSave\r\n$4\r\nBrad\r\n");
+        var saveHttpContent = CreateStringContent("*1\r\n$4\r\nsave\r\n");
+
+        var response = await client.PostAsync(_rediLiteAddress, setHttpContent);
+        var setResponseString = await response.Content.ReadAsStringAsync();
+
+        response = await client.PostAsync(_rediLiteAddress, saveHttpContent);
+        var saveResponseString = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(RESPConstants.OkResponse, setResponseString);
+        Assert.Equal(RESPConstants.OkResponse, saveResponseString);
     }
 
     private StringContent CreateStringContent(string message)

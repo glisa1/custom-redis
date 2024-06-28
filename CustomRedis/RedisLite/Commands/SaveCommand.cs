@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using RedisLite.Persistance;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
-using System.Text.Unicode;
 
 namespace RedisLite.Commands;
 
@@ -23,7 +23,12 @@ internal class SaveCommand : Command
         {
             var keyValuePairs = PersistanceStore.GetKeysAndValues();
 
-            Task.WaitAny(Task.FromResult(SaveToFile(keyValuePairs)));
+            if (keyValuePairs.Count == 0)
+            {
+                return "OK";
+            }
+
+            var result = Task.WaitAny(SaveToFile(keyValuePairs));
 
             return "OK";
         }
@@ -35,21 +40,12 @@ internal class SaveCommand : Command
 
     private async Task SaveToFile(List<KeyValuePair<string, object>> keyValuePairs)
     {
-        var fileName = GetConfigurationSectionValue("saveCommandFileName");
+        const string fileName = "dbState.txt";
 
         var keyValuePairsJson = JsonSerializer.Serialize(keyValuePairs);
 
         var bytes = UTF8Encoding.UTF8.GetBytes(keyValuePairsJson);
 
-        var fileStream = File.Create(fileName);
-        await fileStream.WriteAsync(bytes, 0, bytes.Length);
-    }
-
-    private string GetConfigurationSectionValue(string key)
-    {
-        var configurationManager = new ConfigurationManager();
-        var fileName = configurationManager.GetSection(key).Value;
-
-        return fileName ?? throw new ArgumentException("The file name is not defined.");
+        await File.WriteAllTextAsync(fileName, keyValuePairsJson);
     }
 }

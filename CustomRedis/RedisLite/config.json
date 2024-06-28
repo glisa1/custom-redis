@@ -1,5 +1,4 @@
 ﻿{
   "runningAddress":  "127.0.0.1",
-  "runningPort": "6379",
-  "saveCommandFileName":  "dbState"
+  "runningPort": "6379"
 }
