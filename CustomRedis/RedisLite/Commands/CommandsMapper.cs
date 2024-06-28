@@ -61,5 +61,6 @@ public static class CommandsMapper
         { "lpush", typeof(LPushCommand) },
         { "rpush", typeof(RPushCommand) },
         { "save", typeof(SaveCommand) },
+        { "load", typeof(LoadCommand) },
     };
 }

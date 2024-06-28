@@ -626,6 +626,17 @@ public class ServerTests
         Assert.Equal(RESPConstants.OkResponse, saveResponseString);
     }
 
+    [Fact]
+    public async void LoadTest()
+    {
+        var loadHttpContent = CreateStringContent("*1\r\n$4\r\nload\r\n");
+
+        var response = await client.PostAsync(_rediLiteAddress, loadHttpContent);
+        var loadResponseString = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(RESPConstants.OkResponse, loadResponseString);
+    }
+
     private StringContent CreateStringContent(string message)
     {
         var stringPayload = JsonConvert.SerializeObject(new { message });
