@@ -24,11 +24,19 @@ public class CommandsMapperTests
         Assert.Throws<ArgumentException>(() => CommandsMapper.MapToCommand(commandArgs));
     }
 
+    /// <summary>
+    /// This test should fail if command has more arguments than it should.
+    /// Currently the command creation will fail only if there are less
+    /// arguments than expected.
+    /// </summary>
     [Fact]
-    public void OnCommandMapping_Fails_WhenMappingPingCommandWithInvalidNumberOfArguments()
+    public void OnCommandMapping_Passes_WhenMappingPingCommandWithInvalidNumberOfArguments()
     {
         var commandArgs = new List<string>() { "PING", "Test" };
 
-        Assert.Throws<TargetInvocationException>(() => CommandsMapper.MapToCommand(commandArgs));
+        var command = CommandsMapper.MapToCommand(commandArgs);
+
+        Assert.NotNull(command);
+        Assert.IsType<PingCommand>(command);
     }
 }
