@@ -44,7 +44,7 @@ public class LiteHttpServer
         }
         finally
         {
-            serverListenter.Stop();
+            serverListenter.Close();
         }
     }
 
