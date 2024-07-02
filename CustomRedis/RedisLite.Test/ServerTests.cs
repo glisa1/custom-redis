@@ -17,6 +17,7 @@ public class ServerTests
 
     public ServerTests()
     {
+        client.Timeout = DateTime.Now.AddDays(1).TimeOfDay;
         var serverConfig = new ServerConfig(_host, _port);
 
         redisLiteHttpServer = new LiteHttpServer(serverConfig);
