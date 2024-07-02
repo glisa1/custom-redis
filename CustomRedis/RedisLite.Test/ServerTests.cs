@@ -5,11 +5,12 @@ using System.Text;
 
 namespace RedisLite.Test;
 
-public class ServerTests
+public class ServerTests : IAsyncDisposable
 {
     private readonly string _rediLiteAddress = $"http://{_host}:{_port}/";
     private readonly HttpClient client = new HttpClient();
     private LiteHttpServer redisLiteHttpServer;
+    private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
     private const string _host = "127.0.0.1";
     private const int _port = 6379;
     private const string wrongNumberOfParametersForCommand = "-Message in wrong format. Unexpected number of array elements.\r\n";
@@ -22,7 +23,7 @@ public class ServerTests
 
         redisLiteHttpServer = new LiteHttpServer(serverConfig);
 
-        redisLiteHttpServer.StartAsync();
+        redisLiteHttpServer.StartAsync(cancellationTokenSource.Token);
     }
 
     [Fact]
@@ -643,5 +644,10 @@ public class ServerTests
         var stringPayload = JsonConvert.SerializeObject(new { message });
 
         return new StringContent(stringPayload, Encoding.UTF8, "application/json");
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await cancellationTokenSource.CancelAsync();
     }
 }
