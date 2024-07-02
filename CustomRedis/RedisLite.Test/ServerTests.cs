@@ -23,7 +23,7 @@ public class ServerTests : IAsyncDisposable
 
         redisLiteHttpServer = new LiteHttpServer(serverConfig);
 
-        redisLiteHttpServer.StartAsync(cancellationTokenSource.Token);
+        Task.Run(async () => await redisLiteHttpServer.StartAsync(cancellationTokenSource.Token));
     }
 
     [Fact]
