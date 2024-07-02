@@ -15,19 +15,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
-    - name: Print ls
-      run: echo ls
-    - name: Restore dependencies
-      run: dotnet restore
-      working-directory: ./CustomRedis
-    - name: Build
-      run: dotnet build --no-restore
-      working-directory: ./CustomRedis
-    - name: Test
-      run: dotnet test
-      working-directory: ./CustomRedis
+    - task: UseDotNet@2
+      inputs:
+        packageType: 'sdk'
+        version: '8.0.x'
+      displayName: 'Use .Net 8 SDK.'
+      
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'restore'
+      displayName: 'Restore packages.'
+      
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'test'
+      displayName: 'Run tests.'
