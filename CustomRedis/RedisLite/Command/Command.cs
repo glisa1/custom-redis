@@ -1,4 +1,4 @@
-﻿namespace RedisLite.Commands;
+﻿namespace RedisLite.Command;
 
 public abstract class Command
 {
@@ -13,5 +13,5 @@ public abstract class Command
     public abstract int NumberOfExpectedArguments { get; }
     public abstract string CommandName { get; }
     public List<string> Arguments { get; }
-    public abstract Task<object> ExecuteAsync();
+    public abstract Task<object?> ExecuteAsync();
 }

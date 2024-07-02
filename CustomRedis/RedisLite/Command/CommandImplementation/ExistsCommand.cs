@@ -1,6 +1,7 @@
-﻿using RedisLite.Persistance;
+﻿using RedisLite.Command.Utility;
+using RedisLite.Persistance;
 
-namespace RedisLite.Commands;
+namespace RedisLite.Command.CommandImplementation;
 
 internal sealed class ExistsCommand : Command
 {
@@ -13,12 +14,12 @@ internal sealed class ExistsCommand : Command
 
     public override string CommandName => "exists";
 
-    public override Task<object> ExecuteAsync()
+    public override Task<object?> ExecuteAsync()
     {
         var key = Arguments.FirstOrDefault() ?? throw new ArgumentException("Invalid key argument.");
 
         var value = PersistanceStore.GetValue(key);
 
-        return value is null ? Task.FromResult((object)0) : Task.FromResult((object)1);
+        return value is null ? TaskFromResultMapper.MapFromResult(0) : TaskFromResultMapper.MapFromResult(1);
     }
 }

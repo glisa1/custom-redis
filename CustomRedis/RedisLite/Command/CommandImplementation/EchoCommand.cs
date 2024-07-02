@@ -1,4 +1,6 @@
-﻿namespace RedisLite.Commands;
+﻿using RedisLite.Command.Utility;
+
+namespace RedisLite.Command.CommandImplementation;
 
 internal class EchoCommand : Command
 {
@@ -7,8 +9,8 @@ internal class EchoCommand : Command
     { }
     public override int NumberOfExpectedArguments => 1;
     public override string CommandName => "ECHO";
-    public override Task<object> ExecuteAsync()
+    public override Task<object?> ExecuteAsync()
     {
-        return Task.FromResult((object)Arguments[0]);
+        return TaskFromResultMapper.MapFromResult(Arguments[0]);
     }
 }

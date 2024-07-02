@@ -1,6 +1,7 @@
-﻿using RedisLite.Persistance;
+﻿using RedisLite.Command.Utility;
+using RedisLite.Persistance;
 
-namespace RedisLite.Commands;
+namespace RedisLite.Command.CommandImplementation;
 
 internal class RPushCommand : Command
 {
@@ -13,7 +14,7 @@ internal class RPushCommand : Command
 
     public override string CommandName => "rpush";
 
-    public override Task<object> ExecuteAsync()
+    public override Task<object?> ExecuteAsync()
     {
         try
         {
@@ -25,18 +26,18 @@ internal class RPushCommand : Command
             if (value == null)
             {
                 PersistanceStore.SetKey(key, new PersistanceObject(argumentsToAddToList));
-                return Task.FromResult((object)numberOfArguments);
+                return TaskFromResultMapper.MapFromResult(numberOfArguments);
             }
 
             var list = (List<string>)value.PersistedData;
             list.AddRange(argumentsToAddToList);
             var result = PersistanceStore.SetKey(key, new PersistanceObject(list));
 
-            return Task.FromResult((object)list.Count);
+            return TaskFromResultMapper.MapFromResult(list.Count);
         }
         catch (Exception)
         {
-            return Task.FromResult((object)new Exception("The value is not a list."));
+            return TaskFromResultMapper.MapFromResult(new Exception("The value is not a list."));
         }
     }
 }

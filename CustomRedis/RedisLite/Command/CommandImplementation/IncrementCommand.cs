@@ -1,6 +1,7 @@
-﻿using RedisLite.Persistance;
+﻿using RedisLite.Command.Utility;
+using RedisLite.Persistance;
 
-namespace RedisLite.Commands;
+namespace RedisLite.Command.CommandImplementation;
 
 internal sealed class IncrementCommand : Command
 {
@@ -13,7 +14,7 @@ internal sealed class IncrementCommand : Command
 
     public override string CommandName => "incr";
 
-    public override Task<object> ExecuteAsync()
+    public override Task<object?> ExecuteAsync()
     {
         try
         {
@@ -22,17 +23,17 @@ internal sealed class IncrementCommand : Command
             if (value == null)
             {
                 PersistanceStore.SetKey(key, new PersistanceObject("1"));
-                return Task.FromResult((object)1);
+                return TaskFromResultMapper.MapFromResult(1);
             }
 
             var intValue = Convert.ToInt64(value.PersistedData);
             var result = PersistanceStore.SetKey(key, new PersistanceObject((++intValue).ToString()));
 
-            return Task.FromResult((object)intValue);
+            return TaskFromResultMapper.MapFromResult(intValue);
         }
         catch
         {
-            return Task.FromResult((object)new Exception("The value is not an integer or out of range."));
+            return TaskFromResultMapper.MapFromResult(new Exception("The value is not an integer or out of range."));
         }
     }
 }

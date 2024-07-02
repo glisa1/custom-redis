@@ -1,8 +1,7 @@
 ﻿using RedisLite.Persistance;
-using System.Text;
 using System.Text.Json;
 
-namespace RedisLite.Commands;
+namespace RedisLite.Command.CommandImplementation;
 
 internal class LoadCommand : Command
 {
@@ -15,7 +14,7 @@ internal class LoadCommand : Command
 
     public override string CommandName => "load";
 
-    public override async Task<object> ExecuteAsync()
+    public override async Task<object?> ExecuteAsync()
     {
         try
         {

@@ -1,6 +1,7 @@
-﻿using RedisLite.Persistance;
+﻿using RedisLite.Command.Utility;
+using RedisLite.Persistance;
 
-namespace RedisLite.Commands;
+namespace RedisLite.Command.CommandImplementation;
 
 internal class DeleteCommand : Command
 {
@@ -13,7 +14,7 @@ internal class DeleteCommand : Command
 
     public override string CommandName => "del";
 
-    public override Task<object> ExecuteAsync()
+    public override Task<object?> ExecuteAsync()
     {
         var numberOfDeletedKeys = 0;
         foreach (var argument in Arguments)
@@ -22,6 +23,6 @@ internal class DeleteCommand : Command
                 numberOfDeletedKeys++;
         }
 
-        return Task.FromResult((object)numberOfDeletedKeys);
+        return TaskFromResultMapper.MapFromResult(numberOfDeletedKeys);
     }
 }

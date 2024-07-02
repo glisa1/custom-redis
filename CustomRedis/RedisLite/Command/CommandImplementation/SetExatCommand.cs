@@ -1,6 +1,7 @@
-﻿using RedisLite.Persistance;
+﻿using RedisLite.Command.Utility;
+using RedisLite.Persistance;
 
-namespace RedisLite.Commands;
+namespace RedisLite.Command.CommandImplementation;
 
 internal class SetExatCommand : Command
 {
@@ -11,7 +12,7 @@ internal class SetExatCommand : Command
 
     public override int NumberOfExpectedArguments => 4;
     public override string CommandName => "set eaxt";
-    public override Task<object> ExecuteAsync()
+    public override Task<object?> ExecuteAsync()
     {
         try
         {
@@ -19,11 +20,11 @@ internal class SetExatCommand : Command
             DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(seconds);
             var persistanceData = new PersistanceObject(Arguments[1], dateTimeOffset);
             PersistanceStore.SetKey(Arguments[0], persistanceData);
-            return Task.FromResult((object)"OK");
+            return TaskFromResultMapper.MapFromResult("OK");
         }
         catch (Exception ex)
         {
-            return Task.FromResult((object)ex);
+            return TaskFromResultMapper.MapFromResult(ex);
         }
     }
 }
