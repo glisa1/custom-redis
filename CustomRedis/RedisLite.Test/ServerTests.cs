@@ -634,7 +634,7 @@ public class ServerTests(ServerTestsFixture fixture) : IClassFixture<ServerTests
     }
 }
 
-public sealed class ServerTestsFixture : IDisposable
+public sealed class ServerTestsFixture : IAsyncLifetime
 {
     private const string _host = "127.0.0.1";
     private const int _port = 6379;
@@ -650,8 +650,7 @@ public sealed class ServerTestsFixture : IDisposable
         Task.Run(async () => await redisLiteHttpServer.StartAsync());
     }
 
-    public void Dispose()
-    {
-        redisLiteHttpServer.Stop();
-    }
+    public Task InitializeAsync() => redisLiteHttpServer.StartAsync();
+
+    public Task DisposeAsync() => Task.Run(redisLiteHttpServer.Stop);
 }
