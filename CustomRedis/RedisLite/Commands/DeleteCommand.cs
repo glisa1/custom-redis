@@ -13,7 +13,7 @@ internal class DeleteCommand : Command
 
     public override string CommandName => "del";
 
-    public override object Execute()
+    public override Task<object> ExecuteAsync()
     {
         var numberOfDeletedKeys = 0;
         foreach (var argument in Arguments)
@@ -22,6 +22,6 @@ internal class DeleteCommand : Command
                 numberOfDeletedKeys++;
         }
 
-        return numberOfDeletedKeys;
+        return Task.FromResult((object)numberOfDeletedKeys);
     }
 }

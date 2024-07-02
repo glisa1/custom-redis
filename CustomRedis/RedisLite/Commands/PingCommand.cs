@@ -9,5 +9,5 @@ public class PingCommand : Command
     {}
     public override int NumberOfExpectedArguments => 0;
     public override string CommandName => "PING";
-    public override object Execute() => "PONG";
+    public override Task<object> ExecuteAsync() => Task.FromResult((object)"PONG");
 }

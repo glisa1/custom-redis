@@ -15,7 +15,7 @@ internal class SaveCommand : Command
 
     public override string CommandName => "save";
 
-    public override object Execute()
+    public async override Task<object> ExecuteAsync()
     {
         try
         {
@@ -26,7 +26,7 @@ internal class SaveCommand : Command
                 return "OK";
             }
 
-            var result = Task.WaitAny(SaveToFile(keyValuePairs));
+            await SaveToFile(keyValuePairs);
 
             return "OK";
         }

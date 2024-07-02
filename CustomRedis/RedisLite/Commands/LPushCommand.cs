@@ -13,7 +13,7 @@ internal class LPushCommand : Command
 
     public override string CommandName => "lpush";
 
-    public override object Execute()
+    public override Task<object> ExecuteAsync()
     {
         try
         {
@@ -26,18 +26,18 @@ internal class LPushCommand : Command
             if (value == null)
             {
                 PersistanceStore.SetKey(key, new PersistanceObject(argumentsToAddToList));
-                return numberOfArguments;
+                return Task.FromResult((object)numberOfArguments);
             }
 
             var list = (List<string>)value.PersistedData;
             list.InsertRange(0, argumentsToAddToList);
             var result = PersistanceStore.SetKey(key, new PersistanceObject(list));
 
-            return list.Count;
+            return Task.FromResult((object)list.Count);
         }
         catch (Exception)
         {
-            return new Exception("The value is not a list.");
+            return Task.FromResult((object)new Exception("The value is not a list."));
         }
     }
 }

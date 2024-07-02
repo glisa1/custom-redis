@@ -12,24 +12,24 @@ internal class GetCommand : Command
     }
     public override int NumberOfExpectedArguments => 1;
     public override string CommandName => "get";
-    public override object Execute()
+    public override Task<object> ExecuteAsync()
     {
         var value = PersistanceStore.GetValue(Arguments[0]) as PersistanceObject;
         if (value == null)
         {
-            return value!;
+            return Task.FromResult((object)value!);
         }
 
         if (value.ExpiryDate != null && value.ExpiryDate < DateTime.UtcNow)
         {
-            return null;
+            return Task.FromResult((object)null);
         }
 
         if (value.PersistedData is ICollection)
         {
-            return value.PersistedData;
+            return Task.FromResult((object)value.PersistedData);
         }
 
-        return value.PersistedData.ToString()!.ToCharArray();
+        return Task.FromResult((object)value.PersistedData.ToString()!.ToCharArray());
     }
 }

@@ -13,7 +13,7 @@ internal class DecrementCommand : Command
 
     public override string CommandName => "decr";
 
-    public override object Execute()
+    public override Task<object> ExecuteAsync()
     {
         try
         {
@@ -22,17 +22,17 @@ internal class DecrementCommand : Command
             if (value == null)
             {
                 PersistanceStore.SetKey(key, new PersistanceObject("-1"));
-                return -1;
+                return Task.FromResult((object)-1);
             }
 
             var intValue = Convert.ToInt64(value.PersistedData);
             var result = PersistanceStore.SetKey(key, new PersistanceObject((--intValue).ToString()));
 
-            return intValue;
+            return Task.FromResult((object)intValue);
         }
         catch
         {
-            return new Exception("The value is not an integer or out of range.");
+            return Task.FromResult((object)new Exception("The value is not an integer or out of range."));
         }
     }
 }

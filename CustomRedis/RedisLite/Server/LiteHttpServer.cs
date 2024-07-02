@@ -69,7 +69,7 @@ public class LiteHttpServer
 
             var command = CommandsMapper.MapToCommand(commandAndArguments);
 
-            var commandResult = command.Execute();
+            var commandResult = await command.ExecuteAsync();
 
             var responseMessage = respParser.SerializeMessage(commandResult);
 

@@ -13,12 +13,12 @@ internal sealed class ExistsCommand : Command
 
     public override string CommandName => "exists";
 
-    public override object Execute()
+    public override Task<object> ExecuteAsync()
     {
         var key = Arguments.FirstOrDefault() ?? throw new ArgumentException("Invalid key argument.");
 
         var value = PersistanceStore.GetValue(key);
 
-        return value is null ? 0 : 1;
+        return value is null ? Task.FromResult((object)0) : Task.FromResult((object)1);
     }
 }

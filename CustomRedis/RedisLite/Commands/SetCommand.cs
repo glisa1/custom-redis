@@ -11,18 +11,18 @@ internal class SetCommand : Command
     }
     public override int NumberOfExpectedArguments => 2;
     public override string CommandName => "set";
-    public override object Execute()
+    public override Task<object> ExecuteAsync()
     {
         try
         {
             var persistanceData = new PersistanceObject(Arguments[1]);
             PersistanceStore.SetKey(Arguments[0], persistanceData);
 
-            return "OK";
+            return Task.FromResult((object)"OK");
         }
         catch (Exception ex)
         {
-            return ex;
+            return Task.FromResult((object)ex);
         }
     }
 }

@@ -21,9 +21,11 @@ internal class RESPSerializer
             else if (messageObject is int intValue)
                 messageContent = SerializeIntegerType(intValue);
             else if (messageObject is long longValue)
-                messageContent= SerializeLongType(longValue);
+                messageContent = SerializeLongType(longValue);
             else if (messageObject is ICollection collectionValue)
                 messageContent = SerializeArrayType(collectionValue);
+            else
+                throw new Exception("Something went wrong with the response.");
 
             return new RESPMessage(messageContent, false);
         }

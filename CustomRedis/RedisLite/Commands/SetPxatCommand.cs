@@ -11,7 +11,7 @@ internal class SetPxatCommand : Command
 
     public override int NumberOfExpectedArguments => 4;
     public override string CommandName => "set pxat";
-    public override object Execute()
+    public override Task<object> ExecuteAsync()
     {
         try
         {
@@ -19,11 +19,11 @@ internal class SetPxatCommand : Command
             DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeMilliseconds(milliseconds);
             var persistanceData = new PersistanceObject(Arguments[1], dateTimeOffset);
             PersistanceStore.SetKey(Arguments[0], persistanceData);
-            return "OK";
+            return Task.FromResult((object)"OK");
         }
         catch (Exception ex)
         {
-            return ex;
+            return Task.FromResult((object)ex);
         }
     }
 }

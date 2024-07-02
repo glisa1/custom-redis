@@ -7,8 +7,8 @@ internal class EchoCommand : Command
     { }
     public override int NumberOfExpectedArguments => 1;
     public override string CommandName => "ECHO";
-    public override object Execute()
+    public override Task<object> ExecuteAsync()
     {
-        return Arguments[0];
+        return Task.FromResult((object)Arguments[0]);
     }
 }
