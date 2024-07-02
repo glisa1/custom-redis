@@ -5,24 +5,13 @@ using System.Text;
 
 namespace RedisLite.Test;
 
-public class ServerTests
+public class ServerTests(ServerTestsFixture fixture) : IClassFixture<ServerTestsFixture>
 {
-    private readonly string _rediLiteAddress = $"http://{_host}:{_port}/";
-    private readonly HttpClient client = new HttpClient();
-    private LiteHttpServer redisLiteHttpServer;
-    private const string _host = "127.0.0.1";
-    private const int _port = 6379;
     private const string wrongNumberOfParametersForCommand = "-Message in wrong format. Unexpected number of array elements.\r\n";
     private const string messageElementHasWrongLength = "-Message element has wrong length.\r\n";
 
-    public ServerTests()
-    {
-        var serverConfig = new ServerConfig(_host, _port);
-
-        redisLiteHttpServer = new LiteHttpServer(serverConfig);
-
-        redisLiteHttpServer.StartAsync();
-    }
+    private readonly string _rediLiteAddress = fixture._rediLiteAddress;
+    private readonly HttpClient client = fixture.client;
 
     [Fact]
     public async void OnSendingPingCommand_Passes_ReceivePongResponse()
@@ -642,5 +631,27 @@ public class ServerTests
         var stringPayload = JsonConvert.SerializeObject(new { message });
 
         return new StringContent(stringPayload, Encoding.UTF8, "application/json");
+    }
+}
+
+public sealed class ServerTestsFixture : IDisposable
+{
+    private const string _host = "127.0.0.1";
+    private const int _port = 6379;
+    private LiteHttpServer redisLiteHttpServer;
+    public readonly HttpClient client = new HttpClient();
+    public readonly string _rediLiteAddress = $"http://{_host}:{_port}/";
+
+    public ServerTestsFixture()
+    {
+        var serverConfig = new ServerConfig(_host, _port);
+        redisLiteHttpServer = new LiteHttpServer(serverConfig);
+
+        Task.Run(async () => await redisLiteHttpServer.StartAsync());
+    }
+
+    public void Dispose()
+    {
+        redisLiteHttpServer.Stop();
     }
 }

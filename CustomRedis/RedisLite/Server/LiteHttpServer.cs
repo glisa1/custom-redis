@@ -34,18 +34,27 @@ public class LiteHttpServer
 
         try
         {
-            while (true)
+            using (serverListenter)
             {
-                var context = await serverListenter.GetContextAsync();
-                Log.Information("Connection established.");
+                while (true)
+                {
+                    var context = await serverListenter.GetContextAsync();
+                    Log.Information("Connection established.");
                 
-                await HandleClientAsync(context, cancellationToken);
+                    await HandleClientAsync(context, cancellationToken);
+                }
             }
         }
         finally
         {
-            serverListenter.Stop();
+            serverListenter.Close();
         }
+    }
+
+    public void Stop()
+    {
+        serverListenter.Stop();
+        serverListenter.Close();
     }
 
     private async Task HandleClientAsync(HttpListenerContext context, CancellationToken cancellationToken = default)
