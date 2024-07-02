@@ -48,6 +48,11 @@ public class LiteHttpServer
         }
     }
 
+    public void Stop()
+    {
+        serverListenter.Stop();
+    }
+
     private async Task HandleClientAsync(HttpListenerContext context, CancellationToken cancellationToken = default)
     {
         var request = context.Request;

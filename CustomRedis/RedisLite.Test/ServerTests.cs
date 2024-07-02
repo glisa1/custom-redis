@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RedisLite.Test;
 
-public class ServerTests : IAsyncDisposable
+public class ServerTests : IDisposable
 {
     private readonly string _rediLiteAddress = $"http://{_host}:{_port}/";
     private readonly HttpClient client = new HttpClient();
@@ -646,8 +646,13 @@ public class ServerTests : IAsyncDisposable
         return new StringContent(stringPayload, Encoding.UTF8, "application/json");
     }
 
-    public async ValueTask DisposeAsync()
+    public void Dispose()
     {
-        await cancellationTokenSource.CancelAsync();
+        redisLiteHttpServer.Stop();
+    }
+
+    ~ServerTests()
+    {
+        Dispose();
     }
 }
