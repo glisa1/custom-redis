@@ -1,28 +1,28 @@
-﻿using RedisLite.Persistance;
-using RESP;
+﻿using RedisLite.Command.Utility;
+using RedisLite.Persistance;
 
-namespace RedisLite.Commands;
+namespace RedisLite.Command.CommandImplementation;
 
 internal class SetCommand : Command
 {
     public SetCommand(List<string> args)
-        :base(args)
+        : base(args)
     {
     }
     public override int NumberOfExpectedArguments => 2;
     public override string CommandName => "set";
-    public override object Execute()
+    public override Task<object?> ExecuteAsync()
     {
         try
         {
             var persistanceData = new PersistanceObject(Arguments[1]);
             PersistanceStore.SetKey(Arguments[0], persistanceData);
 
-            return "OK";
+            return TaskFromResultMapper.MapFromResult("OK");
         }
         catch (Exception ex)
         {
-            return ex;
+            return TaskFromResultMapper.MapFromResult(ex);
         }
     }
 }

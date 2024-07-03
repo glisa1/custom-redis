@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.Json;
 
-namespace RedisLite.Commands;
+namespace RedisLite.Command.CommandImplementation;
 
 internal class SaveCommand : Command
 {
@@ -15,7 +15,7 @@ internal class SaveCommand : Command
 
     public override string CommandName => "save";
 
-    public override object Execute()
+    public async override Task<object?> ExecuteAsync()
     {
         try
         {
@@ -26,7 +26,7 @@ internal class SaveCommand : Command
                 return "OK";
             }
 
-            var result = Task.WaitAny(SaveToFile(keyValuePairs));
+            await SaveToFile(keyValuePairs);
 
             return "OK";
         }
@@ -42,7 +42,7 @@ internal class SaveCommand : Command
 
         var keyValuePairsJson = JsonSerializer.Serialize(keyValuePairs);
 
-        var bytes = UTF8Encoding.UTF8.GetBytes(keyValuePairsJson);
+        var bytes = Encoding.UTF8.GetBytes(keyValuePairsJson);
 
         await File.WriteAllTextAsync(fileName, keyValuePairsJson);
     }

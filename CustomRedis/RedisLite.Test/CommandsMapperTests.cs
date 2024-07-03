@@ -1,4 +1,5 @@
-using RedisLite.Commands;
+using RedisLite.Command;
+using RedisLite.Command.CommandImplementation;
 using System.Reflection;
 
 namespace RedisLite.Test;

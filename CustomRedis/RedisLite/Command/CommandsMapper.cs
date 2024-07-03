@@ -1,6 +1,6 @@
-﻿using System.Reflection;
+﻿using RedisLite.Command.CommandImplementation;
 
-namespace RedisLite.Commands;
+namespace RedisLite.Command;
 
 public static class CommandsMapper
 {
@@ -20,7 +20,7 @@ public static class CommandsMapper
 
         var commandLower = command.ToLower();
 
-        if (commandLower == "set" && commandAndArguments.Count > 3) 
+        if (commandLower == "set" && commandAndArguments.Count > 3)
         {
             commandLower += ' ' + commandAndArguments[commandAndArguments.Count - 2].ToLower();
         }
@@ -36,7 +36,7 @@ public static class CommandsMapper
 
         var commandInstance = Activator.CreateInstance(commandType, new object[] { arguments }) as Command;
 
-        if (commandInstance == null) 
+        if (commandInstance == null)
         {
             throw new Exception("Command unknown.");
         }
@@ -45,7 +45,7 @@ public static class CommandsMapper
     }
 
     private static Dictionary<string, Type> CommandsMap => new Dictionary<string, Type>
-    { 
+    {
         { "ping", typeof(PingCommand) },
         { "echo", typeof(EchoCommand) },
         { "set", typeof(SetCommand) },
