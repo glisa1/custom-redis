@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "RedisLite": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}
