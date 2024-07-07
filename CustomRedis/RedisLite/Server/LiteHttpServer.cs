@@ -11,16 +11,14 @@ public class LiteHttpServer
 {
     private readonly HttpListener serverListenter;
     private readonly RESPParser respParser;
-    private readonly IPAddress ipAddress;
     private readonly int port;
 
     public LiteHttpServer(ServerConfig config)
     {
-        ipAddress = IPAddress.Parse(config.HostAddress);
         port = config.Port;
 
         serverListenter = new HttpListener();
-        serverListenter.Prefixes.Add($"http://{ipAddress}:{port}/");
+        serverListenter.Prefixes.Add($"http://{config.HostAddress}:6379/");
 
         respParser = new RESPParser();
     }
