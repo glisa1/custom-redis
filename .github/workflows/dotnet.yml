@@ -28,4 +28,4 @@ jobs:
       working-directory: ./CustomRedis
     - name: test
       run: dotnet test --no-build
-      working-directory: ./customredis
+      working-directory: ./CustomRedis
