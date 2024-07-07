@@ -17,7 +17,7 @@ try
 
 	IConfiguration config = builder.Build();
 
-	var serverPort = config.GetValue<int>("runningPort");
+	var serverPort = 6379;
 	var serverHost = config.GetValue<string>("runningAddress");
 
 	var serverConfig = new ServerConfig(serverHost, serverPort);

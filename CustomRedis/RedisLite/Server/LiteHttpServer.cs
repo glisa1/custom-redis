@@ -11,12 +11,9 @@ public class LiteHttpServer
 {
     private readonly HttpListener serverListenter;
     private readonly RESPParser respParser;
-    private readonly int port;
 
     public LiteHttpServer(ServerConfig config)
     {
-        port = config.Port;
-
         serverListenter = new HttpListener();
         serverListenter.Prefixes.Add($"http://{config.HostAddress}:6379/");
 
@@ -27,7 +24,7 @@ public class LiteHttpServer
     {
         serverListenter.Start();
 
-        Log.Information($"Server listening on port {port}.");
+        Log.Information("Server listening on port 6379.");
         Log.Information("Listening for requests...");
 
         using (serverListenter)
