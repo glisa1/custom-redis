@@ -32,22 +32,15 @@ public class LiteHttpServer
         Log.Information($"Server listening on port {port}.");
         Log.Information("Listening for requests...");
 
-        try
+        using (serverListenter)
         {
-            using (serverListenter)
+            while (true)
             {
-                while (true)
-                {
-                    var context = await serverListenter.GetContextAsync();
-                    Log.Information("Connection established.");
+                var context = await serverListenter.GetContextAsync();
+                Log.Information("Connection established.");
                 
-                    await HandleClientAsync(context, cancellationToken);
-                }
+                await HandleClientAsync(context, cancellationToken);
             }
-        }
-        finally
-        {
-            serverListenter.Close();
         }
     }
 
