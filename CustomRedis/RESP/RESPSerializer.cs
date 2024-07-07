@@ -5,7 +5,7 @@ namespace RESP;
 
 internal class RESPSerializer
 {
-    public RESPMessage SerializeMessage(object messageObject)
+    public RESPMessage SerializeMessage(object? messageObject)
     {
         try
         {

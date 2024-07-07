@@ -1,4 +1,3 @@
 ﻿{
-  "runningAddress":  "127.0.0.1",
-  "runningPort": "6379"
+  "runningAddress":  "*"
 }

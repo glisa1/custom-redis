@@ -16,7 +16,7 @@ public class RESPParser
         return _deserializer.DeserializeMessage(message);
     }
 
-    public RESPMessage SerializeMessage(object messageObject)
+    public RESPMessage SerializeMessage(object? messageObject)
     {
         return _serializer.SerializeMessage(messageObject);
     }

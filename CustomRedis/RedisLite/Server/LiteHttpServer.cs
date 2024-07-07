@@ -11,43 +11,31 @@ public class LiteHttpServer
 {
     private readonly HttpListener serverListenter;
     private readonly RESPParser respParser;
-    private readonly IPAddress ipAddress;
-    private readonly int port;
 
     public LiteHttpServer(ServerConfig config)
     {
-        ipAddress = IPAddress.Parse(config.HostAddress);
-        port = config.Port;
-
         serverListenter = new HttpListener();
-        serverListenter.Prefixes.Add($"http://{ipAddress}:{port}/");
+        serverListenter.Prefixes.Add($"http://{config.HostAddress}:6379/");
 
         respParser = new RESPParser();
     }
 
     public async Task StartAsync(CancellationToken cancellationToken = default)
     {
-        Log.Information($"Server started on port {port}.");
-        Log.Information("Listening for requests...");
-
         serverListenter.Start();
 
-        try
+        Log.Information("Server listening on port 6379.");
+        Log.Information("Listening for requests...");
+
+        using (serverListenter)
         {
-            using (serverListenter)
+            while (true)
             {
-                while (true)
-                {
-                    var context = await serverListenter.GetContextAsync();
-                    Log.Information("Connection established.");
+                var context = await serverListenter.GetContextAsync();
+                Log.Information("Connection established.");
                 
-                    await HandleClientAsync(context, cancellationToken);
-                }
+                await HandleClientAsync(context, cancellationToken);
             }
-        }
-        finally
-        {
-            serverListenter.Close();
         }
     }
 
