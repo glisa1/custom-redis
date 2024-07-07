@@ -27,10 +27,10 @@ public class LiteHttpServer
 
     public async Task StartAsync(CancellationToken cancellationToken = default)
     {
-        Log.Information($"Server started on port {port}.");
-        Log.Information("Listening for requests...");
-
         serverListenter.Start();
+
+        Log.Information($"Server listening on port {port}.");
+        Log.Information("Listening for requests...");
 
         try
         {
