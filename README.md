@@ -1,5 +1,9 @@
 # custom-redis
 
+## Info
+This repo is done following the steps from [the Coding challenges](https://codingchallenges.fyi/challenges/challenge-redis/).
+
+## Instructions
 The app will listen on port 6379 (hardcoded). 
 In order for the container to be able to receive requests from host machine the host address for httpListener is `http:\\*:6379\`. But when trying to run it locally you will get the `Access denied` error. So in order for it to work run with admin priviledges or change host address in config file.
 
